@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nginx Log Viewer</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+</head>
+<body>
+    <h1>Nginx Log Viewer</h1>
+    <table id="nginx-log" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>IP Address</th>
+                <th>Date & Time</th>
+                <th>Request</th>
+                <th>Status Code</th>
+                <th>Response Size</th>
+                <th>Referrer</th>
+                <th>User-Agent</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in log_entries %}
+                <tr>
+                    <td>{{ entry[0] }}</td>
+                    <td>{{ entry[1] }}</td>
+                    <td>{{ entry[2] }}</td>
+                    <td>{{ entry[3] }}</td>
+                    <td>{{ entry[4] }}</td>
+                    <td>{{ entry[5] }}</td>
+                    <td>{{ entry[6] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        $(document).ready(function() {
+            $('#nginx-log').DataTable();
+        });
+    </script>
+</body>
+</html>

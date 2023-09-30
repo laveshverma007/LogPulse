@@ -1,0 +1,10 @@
+Input -
+
+ upload log file or give ssh creds
+ get log file type
+ 
+Output -
+
+ give the security alert if any bruteforce or dos attack is occuring
+ by analyzing the no. of requests send by the same ip 
+ download reports
