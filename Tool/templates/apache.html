@@ -29,34 +29,58 @@
       darkMode: "class",
     };
   </script>
-  <body
-    class="bg-gray-100 font-sans dark:bg-gray-700 transition-all duration-700"
-  >
+
+<body class="bg-gray-100 font-sans dark:bg-gray-700 transition-all duration-700  -z-30">
+
+
+  <div class="flex pt-4 pl-6 z-50  ">
+    <input type="checkbox" id="drawer-toggle" class="relative sr-only peer">
+    <label id="drawer-settings" for="drawer-toggle" class="absolute z-10 top-4 -mb-10 left-6 text-sm inline-block p-2 transition-all transform duration-500 bg-blue-500 dark:bg-blue-600 rounded-md peer-checked:left-64 text-white dark:text-black" onclick="document.getElementById('drawer-settings').classList.toggle('fixed'); document.getElementById('drawer-settings').classList.toggle('absolute');document.getElementById('drawer-settings').classList.toggle('ml-2');document.getElementById('blurr').classList.toggle('opacity-40');">  
+      Settings
+    </label>
+    <div class="fixed top-0 left-0 z-20 w-64 h-full transition-all duration-500 transform -translate-x-full bg-white shadow-lg peer-checked:translate-x-0 dark:bg-gray-800">
+      <div class="px-6 py-6">
+        <label class="relative inline-flex items-center mb-5 cursor-pointer">
+          <input type="checkbox" value="" class="sr-only peer" onchange="toggleDarkMode()">
+          <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+          <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Dark Mode</span>
+        </label>        
+      </div>
+    </div>
+  </div>
+
+  <!-- Your existing content goes here -->
+<div id="blurr">
+  <script>
+    // Function to toggle dark mode and close settings drawer
+    function toggleDarkMode() {
+      const body = document.body;
+      const html = document.documentElement;
+      const settingsDrawer = document.getElementById("settingsDrawer");
+
+
+      if (body.classList.contains("dark")) {
+        darkmode = false;
+        body.classList.remove("dark");
+        html.classList.remove("dark");
+        updateChart1();
+        updateChart2();
+      } else {
+        darkmode = true;
+        body.classList.add("dark");
+        html.classList.add("dark");
+        updateChart1();
+        updateChart2();
+      }
+    }
+  </script>
+  
     <div class="transition-all duration-700 px-6 py-12 mx-auto max-w-8xl">
       <h1
-        class="transition-all duration-700 text-4xl font-bold text-red-700 mb-8 dark:text-red-500"
+        class="transition-all duration-700 text-4xl font-bold text-red-700 mb-8 dark:text-cyan-500"
       >
         Overall Analysis
       </h1>
-      <div class="transition-all duration-700 py-4 mx-2">
-        <label
-          class="transition-all duration-700 relative inline-flex items-center cursor-pointer"
-        >
-          <input
-            type="checkbox"
-            value=""
-            class="transition-all duration-700 sr-only peer"
-            onclick="toggleDarkMode()"
-          />
-          <div
-            class="transition-all duration-700 w-11 h-6 mb-2 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-          ></div>
-          <span
-            class="transition-all duration-700 ml-3 text-lg -mt-2 font-medium text-gray-900 dark:text-gray-300"
-            >Dark Mode</span
-          >
-        </label>
-      </div>
       <div
         class="transition-all duration-700 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
       >
@@ -192,7 +216,7 @@
         class="transition-all duration-700 bg-white rounded-lg shadow-md p-6 mt-8 dark:bg-gray-800"
       >
         <h2
-          class="transition-all duration-700 text-2xl font-semibold text-gray-900 mb-4 dark:text-white"
+          class="transition-all duration-700 text-2xl font-semibold text-gray-900 mb-4 dark:text-white mt-5"
         >
           Visitors Per Hour
         </h2>
@@ -221,8 +245,13 @@
             </div>
           </div>
         </div>
-
+        <h2
+        class="transition-all duration-700 text-2xl font-semibold text-gray-900 mb-4 dark:text-white mt-20"
+      >
+        Requested Files (URLS)
+      </h2>
         <div id="requested_files_chart"></div>
+        
         <div class="transition-all duration-700 flex justify-end mt-4 mr-16">
           <div
             class="transition-all duration-700 panel p-4 border rounded-lg bg-gray-100 dark:bg-gray-600"
@@ -425,5 +454,6 @@
         }
       }
     </script>
+    </div>
   </body>
 </html>

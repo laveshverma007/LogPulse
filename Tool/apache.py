@@ -60,7 +60,7 @@ max_points_to_display = 1000  # Adjust this as needed
 step_size = max(len(visitors_in_hour) // max_points_to_display, 1)
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/reports', methods=['GET', 'POST'])
 def display_dataframe():
     # Create a Plotly figure for Visitors Per Hour
     columns = logs_df.columns.tolist()
