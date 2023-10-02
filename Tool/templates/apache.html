@@ -511,18 +511,40 @@
               ...updatedLayout
           });
         }
+
         document.getElementById('dataRange2').addEventListener('input', updateChart2);
         updateChart2();
 
         var chartData = {{ requested_files_chart|safe }}['data'];
-        var getrequests = chartData[0].x;
-        var postrequests = chartData[1].x;
-        var headrequests = chartData[2].x;
-        var optionsrequests = chartData[3].x;
-        var getHits = chartData[0].y;
-        var postHits = chartData[1].y;
-        var headHits = chartData[2].y;
-        var optionsHits = chartData[3].y;
+        // console.log(chartData)
+        var getrequests = []
+        var getHits = []
+        var postrequests = []
+        var postHits = []
+        var headrequests = []
+        var headHits = []
+        var optionsrequests = []
+        var optionsHits = []
+        if(chartData.length >= 1){
+          getrequests = chartData[0].x;
+          getHits = chartData[0].y;
+        }
+        if(chartData.length >= 2){
+          postrequests = chartData[1].x;
+          postHits = chartData[1].y;
+        }
+        if(chartData.length >= 3){
+          headrequests = chartData[2].x;
+          headHits = chartData[2].y;
+        }
+        if(chartData.length >= 4){
+          optionsrequests = chartData[3].x;
+          optionsHits = chartData[3].y;
+        }
+
+        // console.log(getHits)
+        // console.log(postHits)
+        // console.log(headHits)
 
         // Create a dictionary to map requests to hits
         var requestToHitsMap = {};
@@ -539,7 +561,7 @@
             };
         }
 
-        console.log(postHits)
+        // console.log(postHits)
         // Update POST, HEAD, and OPTIONS hits based on their corresponding requests
         for (var i = 0; i < postrequests.length; i++) {
             var request = postrequests[i];
