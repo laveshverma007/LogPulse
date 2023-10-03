@@ -3,9 +3,8 @@ import pandas as pd
 from flask import Flask, render_template, request, send_from_directory, redirect, url_for, flash
 from flask_session import Session
 import os
-import sys
-import secrets
 import plotly.express as px
+import hashlib
 from loguru import logger
 import re
 import plotly.graph_objs as go
@@ -67,24 +66,34 @@ def create_df(log_file_path):
     return logs_df, visitors_in_hour, step_size
 
 
-def generate_random_filename():
-    return secrets.token_hex(32)
+def generate_random_filename(content):
+    return hashlib.md5(content).hexdigest()
 
+def requested_files(max_points_to_display,logs_df):
+    requested_files_count = logs_df.groupby(
+        ['request', 'method']).size().reset_index(name='count')
+    requested_files_count = requested_files_count.sort_values(
+        by='count', ascending=False)
+    fig = px.bar(requested_files_count.head(max_points_to_display), x='request', y='count', color='method',
+                labels={'request': 'Request', 'count': 'Number of Requests', 'method': 'Method'})
+    return fig.to_json()
 
 @app.route('/', methods=['GET','POST'])
 def dashboard():
     if request.method == 'POST':
         f = request.files['file']
         if f and allowed_file(f.filename):
-            random_filename = generate_random_filename()
+            content = f.read()
+            f.seek(0)
+            print("content :",content)
+            random_filename = generate_random_filename(content)
             extension = 'txt'
             new_filename = random_filename + '.' + extension
             print(new_filename)
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], new_filename))
             return redirect(f"/reports/{random_filename}")
         if f:
-            file_content = f.read()
-            if len(file_content) >= MAX_FILE_SIZE:
+            if len(f.read()) >= MAX_FILE_SIZE:
                 error = f"File size limit exceeded"
             else:
                 error = f"File extension {f.filename.split('.')[-1]} not supported."
@@ -143,14 +152,7 @@ def reports(report):
 
     visitors_per_hour = fig.to_json()
 
-    requested_files_count = logs_df.groupby(
-        ['request', 'method']).size().reset_index(name='count')
-    requested_files_count = requested_files_count.sort_values(
-        by='count', ascending=False)
-    fig = px.bar(requested_files_count.head(max_points_to_display), x='request', y='count', color='method',
-                labels={'request': 'Request', 'count': 'Number of Requests', 'method': 'Method'})
-
-    requested_files_chart = fig.to_json()
+    requested_files_chart = requested_files(max_points_to_display,logs_df)
 
     file_extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'ico', 'tiff', 'svg', 'webp',  # Image files
                     'css', 'scss', 'less', 'sass', 'styl',  # Stylesheets
