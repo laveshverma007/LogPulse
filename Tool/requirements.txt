@@ -13,3 +13,4 @@ advertools
 flask
 loguru
 plotly
+flask_session

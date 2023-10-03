@@ -532,7 +532,7 @@
         var originalChartLayout = chartLayout;
 
         function updateChart2() {
-          var color = darkmode ? '#0F0E0E':'white';
+          var color = darkmode ? '#1a202c':'white';
             var updatedLayout = {
                 paper_bgcolor: color,
                 plot_bgcolor: color,
@@ -695,7 +695,7 @@
         Plotly.newPlot('visitors_per_hour', {{ visitors_per_hour|safe }}['data'], chartLayout);
 
         function updateChart1() {
-            var color = darkmode ? '#0F0E0E':'white';
+            var color = darkmode ? '#1a202c':'white';
             var updatedLayout = {
                 paper_bgcolor: color,
                 plot_bgcolor: color,
@@ -722,7 +722,8 @@
                 mode: 'lines+markers',
                 fill: 'tozeroy',
                 line: { shape: 'spline', smoothing: 1.3 },
-                marker: { size: 8, symbol: 'circle' }
+                marker: { size: 8, symbol: 'circle' },
+                fillcolor: 'rgba(0, 5, 255,0.2)',
             };
 
             Plotly.react('visitors_per_hour', [updatedTrace], { xaxis: { range: initialXRange }, ...updatedLayout, animate: {

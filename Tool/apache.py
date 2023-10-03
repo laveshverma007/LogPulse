@@ -186,5 +186,5 @@ def reports(report):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,port=3000)
     os.system('rm -rf access_logs.parquet log_errors.csv')
