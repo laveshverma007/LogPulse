@@ -44,25 +44,25 @@
             <label
             id="drawer-settings"
             for="drawer-toggle"
-            onclick="document.getElementById('drawer-settings').classList.toggle('fixed'); document.getElementById('drawer-settings').classList.toggle('absolute');document.getElementById('drawer-settings').classList.toggle('ml-2');document.getElementById('blurr').classList.toggle('opacity-40');"
-            class="text-white hover:shadow-lg bg-blue-600 hover:bg-blue-800 hover:scale-110 ease-in-out focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-[100%] text-md m-2 ml-5 p-3.5 text-center inline-flex dark:bg-blue-500 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer absolute z-10 top-4 -mb-10 left-6 transition-all transform duration-500 peer-checked:left-64 peer-checked:-rotate-180 dark:text-gray-700"
+            onclick="document.getElementById('drawer-settings').classList.toggle('ml-2');document.getElementById('blurr').classList.toggle('opacity-40');"
+            class="text-white hover:shadow-lg bg-blue-600 hover:bg-blue-800 hover:scale-110 ease-in-out focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-[100%] text-md m-2 ml-5 p-3.5 text-center inline-flex dark:bg-blue-500 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer fixed z-10 top-4 -mb-10 left-6 transition-all transform duration-500 peer-checked:left-64 peer-checked:-rotate-180 dark:text-gray-700"
             >
-            <svg
-                class="w-5 h-5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 14 10"
-            >
-                <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M1 5h12m0 0L9 1m4 4L9 9"
-                />
-            </svg>
-        </label>
+                <svg
+                    class="w-5 h-5"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 14 10"
+                >
+                    <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M1 5h12m0 0L9 1m4 4L9 9"
+                    />
+                </svg>
+            </label>
             <div
             class="fixed top-0 left-0 z-20 w-64 h-full transition-all duration-500 transform -translate-x-full bg-white shadow-xl peer-checked:translate-x-0 dark:bg-gray-800"
             >
@@ -105,6 +105,18 @@
                 onclick="document.getElementById('drawer-settings').click()"
                 >Files-Hits Analysis</a
                 >
+                <a
+                href="#404-urls"
+                class="block text-gray-700 dark:text-gray-200 font-semibold"
+                onclick="document.getElementById('drawer-settings').click()"
+                >Not found URLs</a
+                >
+                <a
+                href="#hostname-hits"
+                class="block text-gray-700 dark:text-gray-200 font-semibold"
+                onclick="document.getElementById('drawer-settings').click()"
+                >Hostname Hits</a
+                >
             </div>
             </div>
         </div>
@@ -135,11 +147,11 @@
             .getElementById("drawer-settings")
             .addEventListener("click", function () {
                 const blurrDiv = document.getElementById("blurr");
-                document.getElementById("blurr").classList.toggle("fixed");
+                document.getElementById("blurr").classList.toggle("absolute");
                 if (!blurrDiv.onclick) {
-                addClickEvent();
+                    addClickEvent();
                 } else {
-                removeClickEvent();
+                    removeClickEvent();
                 }
             });
         </script>
@@ -484,6 +496,36 @@
                     </div>
                 </div>
             </div>
+
+            <div id="hostname-hits" class="transition-all duration-700 bg-white rounded-lg shadow-md p-6 mt-8 dark:bg-gray-800">
+                <h2 class="transition-all duration-700 text-2xl font-semibold text-gray-900 mb-4 dark:text-gray-100" >
+                Visitor Hostname and IPs
+                </h2>
+                <div id="visitor_hostname"></div>
+
+                <div class="transition-all duration-700 flex justify-end mt-4 mr-16">
+                    <div
+                        class="transition-all duration-700 panel p-4 border rounded-lg bg-gray-100 dark:bg-gray-600"
+                    >
+                        <input
+                        class="transition-all duration-700 w-[700px] px-2 py-1 border rounded-md text-lg text-gray-900 dark:text-gray-100 dark:bg-gray-700"
+                        type="range"
+                        id="dataRange4"
+                        min="2"
+                        max="1000"
+                        step="1"
+                        value="10"
+                        oninput="document.getElementById('dataPointValue4').textContent = this.value;"
+                        />
+                        <div
+                        class="transition-all duration-700 text-gray-600 dark:text-gray-300 text-lg mt-2"
+                        >
+                        Data Points: <span id="dataPointValue4">10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
             <script>
@@ -531,6 +573,9 @@
                     yaxis: {
                         title: 'Visitors'
                     },
+                    margin: {
+                        b: 180, // Adjust this value to increase the gap between x-axis values and the bottom
+                    }
                 };
                     var selectedDataPoints1 = parseInt(document.getElementById('dataRange1').value);
 
@@ -641,7 +686,10 @@
                     yaxis: {
                         title: 'Hits'
                     },
-                    xaxis_tickangle: -45
+                    xaxis_tickangle: -45,
+                    margin: {
+                        b: 180, // Adjust this value to increase the gap between x-axis values and the bottom
+                    }
                 };
                 let selectedDataPoints2 = parseInt(document.getElementById('dataRange2').value);
 
@@ -826,7 +874,10 @@
                             dtick: 1,
                             width: 1
                         },
-                        xaxis_tickangle: -45
+                        xaxis_tickangle: -45,
+                        margin: {
+                            b: 180, // Adjust this value to increase the gap between x-axis values and the bottom
+                        }
                     };
             
                     let selectedDataPoints3 = parseInt(document.getElementById('dataRange3').value);
@@ -872,6 +923,92 @@
             
                 // Initialize the chart
                 updateChart3();
+            </script>
+
+
+            <script>
+                // Assuming you have a <div> with an id "chart" where you want to render the graph
+                var chartDiv2 = 'visitor_hostname';
+            
+                var logsData = {{data|safe}};
+            
+                var color = darkmode ? '#1a202c' : 'white';
+                var layout4 = {
+                    paper_bgcolor: color,
+                    plot_bgcolor: color,
+                    font: {
+                        color: darkmode ? 'white' : 'black'
+                    },
+                    xaxis: {
+                        title: 'Hostname / IPs'
+                    },
+                    yaxis: {
+                        title: 'Hits',
+                    },
+                    xaxis_tickangle: -45
+                };
+            
+                // Convert the JSON data to an array of objects
+                Plotly.newPlot(chartDiv2, logsData, layout4);
+                function updateChart4() {
+                    var color = darkmode ? '#1a202c' : 'white';
+                    var updatedLayout4 = {
+                        paper_bgcolor: color,
+                        plot_bgcolor: color,
+                        font: {
+                            color: darkmode ? 'white' : 'black'
+                        },
+                        xaxis: {
+                            title: 'Hostname / IPs',
+                        },
+                        yaxis: {
+                            title: 'Hits'
+                        },
+                        margin: {
+                            b: 180, // Adjust this value to increase the gap between x-axis values and the bottom
+                        },
+                    };
+            
+                    let selectedDataPoints4 = parseInt(document.getElementById('dataRange4').value);
+                    selectedDataPoints4 = Math.min(Math.max(selectedDataPoints4, 0), logsData.length);
+                    const initialXRange4 = [
+                        logsData[0].client,
+                        logsData[selectedDataPoints4 - 1].client
+                    ];
+                    console.log(selectedDataPoints4)
+                    console.log(initialXRange4)
+                    var hostCounts = {};
+                    logsData.forEach(function (log) {
+                        var host = log.client;
+                        if (hostCounts[host]) {
+                            hostCounts[host]++;
+                        } else {
+                            hostCounts[host] = 1;
+                        }
+                    });
+
+                    let hosts = Object.keys(hostCounts);
+                    let hitCounts = Object.values(hostCounts);
+                    console.log(hitCounts.slice(0, selectedDataPoints4))
+                    console.log(hosts.slice(0, selectedDataPoints4))
+                    const updatedTrace4 = [{
+                        x: hosts.slice(0, selectedDataPoints4),
+                        y: hitCounts.slice(0, selectedDataPoints4),
+                        type: 'bar',
+                        marker: {
+                            color: '#BFF17C'
+                        },
+                        name: 'New Graph'
+                    }];
+            
+                    Plotly.react(chartDiv2, updatedTrace4, {
+                        xaxis: { range: initialXRange4 },
+                        ...updatedLayout4
+                    });
+                }
+                document.getElementById('dataRange4').addEventListener('input', updateChart4);
+            
+                updateChart4();
             </script>
             
 
@@ -923,14 +1060,16 @@
                 updateChart1();
                 updateChart2();
                 updateChart3();
+                updateChart4();    
                 } else {
-                darkmode = true;
-                localStorage.setItem("darkMode", "true");
-                body.classList.add("dark");
-                html.classList.add("dark");
-                updateChart1();
-                updateChart2();
-                updateChart3();
+                    darkmode = true;
+                    localStorage.setItem("darkMode", "true");
+                    body.classList.add("dark");
+                    html.classList.add("dark");
+                    updateChart1();
+                    updateChart2();
+                    updateChart3();
+                    updateChart4();
                 }
             }
             </script>
