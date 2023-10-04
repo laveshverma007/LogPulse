@@ -16,7 +16,7 @@ MAX_FILE_SIZE = 10*1024*1024
 Session(app)
 
 ALLOWED_EXTENSIONS = {'txt', 'log'}
-app.config['UPLOAD_FOLDER'] = '/home/lavesh/Projects/LogPulse/Tool/uploads'
+app.config['UPLOAD_FOLDER'] = './uploads'
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
@@ -111,13 +111,13 @@ def dashboard():
 
 @app.route('/uploads/<filename>')
 def serve_file(filename):
-    return send_from_directory('/home/lavesh/Projects/LogPulse/Tool/uploads', filename)
+    return send_from_directory('./uploads', filename)
 
 
 @app.route('/reports/<report>', methods=['GET'])
 def reports(report):
     flag = 0
-    for filename in os.listdir('/home/lavesh/Projects/LogPulse/Tool/uploads'):
+    for filename in os.listdir('./uploads'):
         if os.path.splitext(filename)[0] == report:
             flag = 1
             file_extension = os.path.splitext(filename)[1].lower()
@@ -125,7 +125,7 @@ def reports(report):
     if (not flag):
         return "<script>document.location='/'</script>"
     full_name = report + file_extension
-    log_file_path = f'/home/lavesh/Projects/LogPulse/Tool/uploads/{full_name}'
+    log_file_path = f'./uploads/{full_name}'
     logs_df, visitors_in_hour, step_size = create_df(log_file_path)
     log_format = detect_log_format(log_file_path)
     max_points_to_display = 1000
