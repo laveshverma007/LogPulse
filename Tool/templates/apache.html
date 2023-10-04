@@ -1,26 +1,23 @@
 <!DOCTYPE html>
 <html class="transition-all duration-700">
-  <head>
-    <title>DataFrame Table</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <head>
+        <title>DataFrame Table</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="https://cdn.tailwindcss.com"></script>
     <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
     />
     <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css"
-    />
+        rel="stylesheet"
+        type="text/css"
+        href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css"
+        />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
     <!-- Tabulator CSS -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.3.0/css/tabulator.min.css"
-      rel="stylesheet"
-    />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.3.0/css/tabulator.min.css" rel="stylesheet"/>
     <!-- Tabulator JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.3.0/js/tabulator.min.js"></script>
     <script src="https://d3js.org/d3.v6.min.js"></script>
@@ -28,808 +25,915 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
     <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-    />
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  </head>
-  <script>
-    tailwind.config = {
-      darkMode: "class",
-    };
-  </script>
-
-  <body
-    class="bg-gray-100 font-sans dark:bg-gray-700 transition-all duration-700 -z-30"
-  >
-    <div class="flex pt-4 pl-6 z-50">
-      <input type="checkbox" id="drawer-toggle" class="relative sr-only peer hidden" />
-      <label
-        id="drawer-settings"
-        for="drawer-toggle"
-        onclick="document.getElementById('drawer-settings').classList.toggle('fixed'); document.getElementById('drawer-settings').classList.toggle('absolute');document.getElementById('drawer-settings').classList.toggle('ml-2');document.getElementById('blurr').classList.toggle('opacity-40');"
-        class="text-white hover:shadow-lg bg-blue-600 hover:bg-blue-800 hover:scale-110 ease-in-out focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-[100%] text-md m-2 ml-5 p-3.5 text-center inline-flex dark:bg-blue-500 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer absolute z-10 top-4 -mb-10 left-6 transition-all transform duration-500 peer-checked:left-64 peer-checked:-rotate-180 dark:text-gray-700"
-      >
-        <svg
-          class="w-5 h-5"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 14 10"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M1 5h12m0 0L9 1m4 4L9 9"
-          />
-        </svg>
-      </label>
-      <div
-        class="fixed top-0 left-0 z-20 w-64 h-full transition-all duration-500 transform -translate-x-full bg-white shadow-xl peer-checked:translate-x-0 dark:bg-gray-800"
-      >
-        <div class="pl-12 pt-8 scale-110">
-          <label class="relative inline-flex items-center mb-5 cursor-pointer">
-            <input
-              id="dark-check"
-              type="checkbox"
-              value=""
-              class="sr-only peer"
-              onchange="toggleDarkMode()"
-            />
-            <div
-              class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-            ></div>
-            <span
-              class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300"
-              >Dark Mode</span
-            >
-          </label>
-        </div>
-        <div
-          class="text-md p-4 ml-4 font-medium text-gray-900 dark:text-gray-300 space-y-4"
-        >
-          <a
-            href="#data-table"
-            class="block text-gray-700 dark:text-gray-200 font-semibold"
-            onclick="document.getElementById('drawer-settings').click()"
-            >Data Table</a
-          >
-          <a
-            href="#visitors-timestamp"
-            class="block text-gray-700 dark:text-gray-200 font-semibold"
-            onclick="document.getElementById('drawer-settings').click()"
-            >Visitors-Timestamp Analysis</a
-          >
-          <a
-            href="#files-hits"
-            class="block text-gray-700 dark:text-gray-200 font-semibold"
-            onclick="document.getElementById('drawer-settings').click()"
-            >Files-Hits Analysis</a
-          >
-        </div>
-      </div>
-    </div>
-
+    rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+        />
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    </head>
     <script>
-      // Function to add the onclick event
-      function addClickEvent() {
-        const blurrDiv = document.getElementById("blurr");
-
-        if (!blurrDiv.onclick) {
-          blurrDiv.onclick = function () {
-            document.getElementById("drawer-settings").click();
-          };
-        }
-      }
-
-      // Function to remove the onclick event
-      function removeClickEvent() {
-        const blurrDiv = document.getElementById("blurr");
-
-        if (blurrDiv.onclick) {
-          blurrDiv.onclick = null;
-        }
-      }
-
-      // Add click event to the settings button
-      document
-        .getElementById("drawer-settings")
-        .addEventListener("click", function () {
-          const blurrDiv = document.getElementById("blurr");
-          document.getElementById("blurr").classList.toggle("fixed");
-          if (!blurrDiv.onclick) {
-            addClickEvent();
-          } else {
-            removeClickEvent();
-          }
-        });
-    </script>
-
-    <!-- Your existing content goes here -->
-    <div id="blurr" class="transform transition-all duration-500 mt-2">
-      <div class="transition-all duration-700 px-6 py-12 mx-auto max-w-8xl">
-        <div class="m-3 mt-5">
-            <svg fill="#000000" viewBox="0 0 24 24" id="dashboard-alt-2" xmlns="http://www.w3.org/2000/svg" class="float-left icon multi-color w-16 h-16 mr-4 -mt-3"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path id="secondary-fill" d="M20.74,14.48A8.89,8.89,0,0,1,17.51,20H6.23A8.89,8.89,0,0,1,3,14.48a9,9,0,0,1,17.74,0Z" style="fill: #2ca9bc; stroke-width: 2;"></path><path id="primary-stroke" d="M21,13a9,9,0,0,1-3.36,7H6.36A9,9,0,1,1,21,13Zm-9,1a1,1,0,1,0,1,1A1,1,0,0,0,12,14Zm4-5-4,6" style="fill: none; stroke: #000000; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></path></g></svg>
-            <h1
-            class="transition-all duration-700 text-4xl font-black text-black mb-8 dark:text-cyan-500"
-            >
-            DASHBOARD
-              <div class="float-right">
-                <button
-                  onclick="javascript:window.print()"
-                  class="download-button transform active:scale-95 bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 text-sm rounded-lg font-bold tracking-widest w-full"
-                >
-                  <div class="flex justify-center items-center relative">
-                    <div class="svg-container">
-                      <!-- Download Icon -->
-                      <svg
-                        class="download-icon"
-                        width="18"
-                        height="22"
-                        viewBox="0 0 18 22"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          class="download-arrow"
-                          d="M13 9L9 13M9 13L5 9M9 13V1"
-                          stroke="#F2F2F2"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M1 17V18C1 18.7956 1.31607 19.5587 1.87868 20.1213C2.44129 20.6839 3.20435 21 4 21H14C14.7956 21 15.5587 20.6839 16.1213 20.1213C16.6839 19.5587 17 18.7956 17 18V17"
-                          stroke="#F2F2F2"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
-                      <div class="download-loader text-white hidden"></div>
-                      <!-- Checked Icon -->
-                      <svg
-                        class="check-svg hidden"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 20 20"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fill-rule="evenodd"
-                          clip-rule="evenodd"
-                          d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20ZM15.1071 7.9071C15.4976 7.51658 15.4976 6.88341 15.1071 6.49289C14.7165 6.10237 14.0834 6.10237 13.6929 6.49289L8.68568 11.5001L7.10707 9.92146C6.71655 9.53094 6.08338 9.53094 5.69286 9.92146C5.30233 10.312 5.30233 10.9452 5.69286 11.3357L7.97857 13.6214C8.3691 14.0119 9.00226 14.0119 9.39279 13.6214L15.1071 7.9071Z"
-                          fill="white"
-                        />
-                      </svg>
-                    </div>
-                    <div class="button-copy pl-2 leading-none uppercase">
-                      DOWNLOAD REPORT
-                    </div>
-                  </div>
-                </button>
-              </div>
-        </div>
-        </h1>
-        <div
-          class="transition-all duration-700 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-        >
-          <!-- Total Requests Card -->
-          <div
-            class="transition-all duration-700 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2"
-          >
-            <span
-              class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
-              >Total Requests</span
-            >
-            <span
-              class="transition-all duration-700 font-semibold text-gray-900 dark:text-gray-100 block text-3xl"
-              >{{ total_requests }}</span
-            >
-          </div>
-
-          <!-- Valid Requests Card -->
-          <div
-            class="transition-all duration-700 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2"
-          >
-            <span
-              class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
-              >Valid Requests</span
-            >
-            <span
-              class="transition-all duration-700 font-semibold text-green-600 dark:text-green-300 block text-3xl"
-              >{{ valid_requests }}</span
-            >
-          </div>
-
-          <!-- Failed Requests Card -->
-          <div
-            class="transition-all duration-700 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2"
-          >
-            <span
-              class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
-              >Failed Requests</span
-            >
-            <span
-              class="transition-all duration-700 font-semibold text-red-600 dark:text-red-300 block text-3xl"
-              >{{ failed_requests }}</span
-            >
-          </div>
-
-          <!-- Unique Visitors Card -->
-          <div
-            class="transition-all duration-700 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2"
-          >
-            <span
-              class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
-              >Unique Visitors</span
-            >
-            <span
-              class="transition-all duration-700 font-semibold text-indigo-600 dark:text-indigo-300 block text-3xl"
-              >{{ unique_visitors }}</span
-            >
-          </div>
-
-          <!-- Number of Requested Files Card -->
-          <div
-            class="transition-all duration-700 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2"
-          >
-            <span
-              class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
-              >Number of Requested Files</span
-            >
-            <span
-              class="transition-all duration-700 font-semibold text-blue-600 dark:text-blue-300 block text-3xl"
-              >{{ num_requested_files }}</span
-            >
-          </div>
-
-          <!-- Referrers Card (if available) -->
-          {% if referrers != "" %}
-          <div
-            class="transition-all duration-700 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2"
-          >
-            <span
-              class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
-              >Referrers</span
-            >
-            <span
-              class="transition-all duration-700 font-semibold text-purple-600 dark:text-purple-300 block text-3xl"
-              >{{ referrers }}</span
-            >
-          </div>
-          {% endif %}
-
-          <!-- Log Size Card -->
-          <div
-            class="transition-all duration-700 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2"
-          >
-            <span
-              class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
-              >Log Size</span
-            >
-            <span
-              class="transition-all duration-700 font-semibold text-yellow-600 dark:text-yellow-300 block text-3xl"
-              >{{ log_size }} bytes</span
-            >
-          </div>
-        </div>
-
-        <div
-          id="data-table"
-          class="transition-all duration-700 bg-white rounded-lg shadow-md p-6 mt-8 overflow-x-auto dark:bg-gray-800"
-        >
-          <h2
-            class="transition-all duration-700 text-2xl font-semibold text-gray-900 mb-4 dark:text-gray-100"
-          >
-            Data Table
-          </h2>
-          <table
-            id="logs_table"
-            class="transition-all duration-700 table table-striped table-bordered"
-          >
-            <thead>
-              <tr>
-                {% for column in columns %}
-                <th
-                  id="{{column}}"
-                  class="transition-all duration-700 px-6 py-3 dark:bg-gray-700 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-700 dark:text-gray-200 uppercase tracking-wider"
-                >
-                  {{ column }}
-                </th>
-                {% endfor %}
-              </tr>
-            </thead>
-          </table>
-        </div>
-
-        <div
-          id="visitors-timestamp"
-          class="transition-all duration-700 bg-white rounded-lg shadow-md p-6 mt-8 dark:bg-gray-800"
-        >
-          <h2
-            class="transition-all duration-700 text-2xl font-semibold text-gray-900 mb-4 dark:text-gray-100"
-          >
-            Visitors Per Hour
-          </h2>
-          <div id="visitors_per_hour"></div>
-          <div
-            class="transition-all duration-700 flex justify-end mt-4 mr-16 pb-4"
-          >
-            <div
-              class="transition-all duration-700 panel p-4 border rounded-lg bg-gray-100 dark:bg-gray-600"
-            >
-              <input
-                class="transition-all duration-700 w-[700px] px-2 py-1 border rounded-md text-lg text-gray-900 dark:text-gray-100 dark:bg-gray-700"
-                type="range"
-                id="dataRange1"
-                min="2"
-                max="1000"
-                step="1"
-                value="20"
-                oninput="document.getElementById('dataPointValue1').textContent = this.value;"
-              />
-              <div
-                class="transition-all duration-700 text-gray-600 dark:text-gray-300 text-lg mt-2"
-              >
-                Data Points: <span id="dataPointValue1">20</span>
-              </div>
-            </div>
-          </div>
-          <div class="container mx-auto mt-4 dark:bg-gray-800">
-            <div
-              class="bg-white rounded-lg shadow-md p-4 mb-4 dark:bg-gray-800"
-            >
-              <label
-                for="row-count"
-                class="text-gray-600 dark:text-gray-100 dark:bg-gray-800"
-                >Number of Rows:</label
-              >
-              <input
-                id="row-count"
-                type="number"
-                min="1"
-                max="100"
-                value="10"
-                class="border rounded-md px-2 py-1 focus:outline-none focus:ring dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:border-blue-300"
-              />
-            </div>
-
-            <div
-              id="table-container1"
-              class="dark:bg-gray-800 dark:text-gray-100"
-            ></div>
-          </div>
-        </div>
-        <div
-          id="files-hits"
-          class="transition-all duration-700 bg-white rounded-lg shadow-md p-6 mt-8 dark:bg-gray-800"
-        >
-          <h2
-            class="transition-all duration-700 text-2xl font-semibold text-gray-900 mb-4 dark:text-gray-100"
-          >
-            Requested Files (URLS)
-          </h2>
-          <div id="requested_files_chart"></div>
-
-          <div class="transition-all duration-700 flex justify-end mt-4 mr-16">
-            <div
-              class="transition-all duration-700 panel p-4 border rounded-lg bg-gray-100 dark:bg-gray-600"
-            >
-              <input
-                class="transition-all duration-700 w-[700px] px-2 py-1 border rounded-md text-lg text-gray-900 dark:text-gray-100 dark:bg-gray-700"
-                type="range"
-                id="dataRange2"
-                min="2"
-                max="1000"
-                step="1"
-                value="10"
-                oninput="document.getElementById('dataPointValue2').textContent = this.value;"
-              />
-              <div
-                class="transition-all duration-700 text-gray-600 dark:text-gray-300 text-lg mt-2"
-              >
-                Data Points: <span id="dataPointValue2">10</span>
-              </div>
-            </div>
-          </div>
-          <div class="container mx-auto mt-4 dark:bg-gray-800">
-            <div
-              class="bg-white rounded-lg shadow-md p-4 mb-4 dark:bg-gray-800"
-            >
-              <label
-                for="row-count2"
-                class="text-gray-600 dark:text-gray-100 dark:bg-gray-800"
-                >Number of Rows:</label
-              >
-              <input
-                id="row-count2"
-                type="number"
-                min="1"
-                max="100"
-                value="10"
-                class="border rounded-md px-2 py-1 focus:outline-none focus:ring dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:border-blue-300"
-              />
-            </div>
-
-            <div
-              id="table-container2"
-              class="dark:bg-gray-800 dark:text-gray-100"
-            ></div>
-          </div>
-        </div>
-      </div>
-
-      <script>
-        // Function to toggle dark mode and close settings drawer
-        function toggleDarkMode() {
-          const body = document.body;
-          const html = document.documentElement;
-          const settingsDrawer = document.getElementById("settingsDrawer");
-
-          if (body.classList.contains("dark")) {
-            darkmode = false;
-            body.classList.remove("dark");
-            html.classList.remove("dark");
-            updateChart1();
-            updateChart2();
-          } else {
-            darkmode = true;
-            body.classList.add("dark");
-            html.classList.add("dark");
-            updateChart1();
-            updateChart2();
-          }
-        }
-
-        $(document).ready(function () {
-          // Smooth scrolling for anchor links
-          $('a[href^="#"]').on("click", function (event) {
-            var target = $(this.getAttribute("href"));
-            if (target.length) {
-              event.preventDefault();
-              $("html, body").stop().animate(
-                {
-                  scrollTop: target.offset().top,
-                },
-                1000
-              );
-            }
-          });
-        });
-      </script>
-
-      <script>
         var darkmode = false;
-        // Define your chart layout with the gray background color
-        var chartLayout = {
-            // Set background colors based on dark mode state
-            paper_bgcolor: 'white',
-            plot_bgcolor: 'white',
-            title: 'Requested files (URLS)',
-            xaxis: { title: 'Requested files' },
-            yaxis: { title: 'Number of Hits' },
-            xaxis_tickangle: -45
+        tailwind.config = {
+            darkMode: "class",
         };
+    </script>
+    <body
+    class="bg-gray-100 font-sans dark:bg-gray-700 transition-all duration-700 -z-30"
+    >
+        <div class="flex pt-4 pl-6 z-50">
+            <input type="checkbox" id="drawer-toggle" class="relative sr-only peer hidden" />
+            <label
+            id="drawer-settings"
+            for="drawer-toggle"
+            onclick="document.getElementById('drawer-settings').classList.toggle('fixed'); document.getElementById('drawer-settings').classList.toggle('absolute');document.getElementById('drawer-settings').classList.toggle('ml-2');document.getElementById('blurr').classList.toggle('opacity-40');"
+            class="text-white hover:shadow-lg bg-blue-600 hover:bg-blue-800 hover:scale-110 ease-in-out focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-[100%] text-md m-2 ml-5 p-3.5 text-center inline-flex dark:bg-blue-500 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer absolute z-10 top-4 -mb-10 left-6 transition-all transform duration-500 peer-checked:left-64 peer-checked:-rotate-180 dark:text-gray-700"
+            >
+            <svg
+                class="w-5 h-5"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 14 10"
+            >
+                <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M1 5h12m0 0L9 1m4 4L9 9"
+                />
+            </svg>
+        </label>
+            <div
+            class="fixed top-0 left-0 z-20 w-64 h-full transition-all duration-500 transform -translate-x-full bg-white shadow-xl peer-checked:translate-x-0 dark:bg-gray-800"
+            >
+            <div class="pl-12 pt-8 scale-110">
+                <label class="relative inline-flex items-center mb-5 cursor-pointer">
+                    <input
+                    id="dark-check"
+                    type="checkbox"
+                    value=""
+                    class="sr-only peer"
+                    onchange="toggleDarkMode()"
+                />
+                <div
+                    class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+                ></div>
+                <span
+                    class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300"
+                    >Dark Mode</span
+                >
+                </label>
+            </div>
+            <div
+                class="text-md p-4 ml-4 font-medium text-gray-900 dark:text-gray-300 space-y-4"
+            >
+                <a
+                href="#data-table"
+                class="block text-gray-700 dark:text-gray-200 font-semibold"
+                onclick="document.getElementById('drawer-settings').click()"
+                >Data Table</a
+                >
+                <a
+                href="#visitors-timestamp"
+                class="block text-gray-700 dark:text-gray-200 font-semibold"
+                onclick="document.getElementById('drawer-settings').click()"
+                >Visitors-Timestamp Analysis</a
+                >
+                <a
+                href="#files-hits"
+                class="block text-gray-700 dark:text-gray-200 font-semibold"
+                onclick="document.getElementById('drawer-settings').click()"
+                >Files-Hits Analysis</a
+                >
+            </div>
+            </div>
+        </div>
 
-        // Create the Plotly graph with the provided data and layout
-        var chartData = {{ requested_files_chart|safe }}['data'];
-        Plotly.newPlot('requested_files_chart', chartData, chartLayout);
+        <script>
+            // Function to add the onclick event
+            function addClickEvent() {
+            const blurrDiv = document.getElementById("blurr");
 
-        // Store the original chart data and layout
-        var originalChartData = chartData;
-        var originalChartLayout = chartLayout;
-
-        function updateChart2() {
-          var color = darkmode ? '#1a202c':'white';
-            var updatedLayout = {
-                paper_bgcolor: color,
-                plot_bgcolor: color,
-                font: {
-                  color: darkmode ? 'white':'black' // Specify the desired font color (e.g., black)
-                },
-                xaxis: {
-                  title: 'Requests'
-              },
-              yaxis: {
-                  title: 'Hits'
-              },
-              xaxis_tickangle: -45
-            };
-          let selectedDataPoints = parseInt(document.getElementById('dataRange2').value);
-
-          // Ensure selectedDataPoints is within a valid range
-          selectedDataPoints = Math.min(Math.max(selectedDataPoints, 0), originalChartData[0].x.length);
-
-          const initialXRange = [
-              originalChartData[0].x[0],
-              originalChartData[0].x[selectedDataPoints - 1]
-          ];
-
-          const updatedTraces = originalChartData.map(function (data) {
-            return {
-              x: data.x.slice(0, selectedDataPoints),
-              y: data.y.slice(0, selectedDataPoints),
-              type: 'bar',
-              marker: {
-                  color: data.marker.color.slice(0, selectedDataPoints),
-              },
-              name: data.name
+            if (!blurrDiv.onclick) {
+                blurrDiv.onclick = function () {
+                document.getElementById("drawer-settings").click();
+                };
             }
-          });
-
-          Plotly.react('requested_files_chart', updatedTraces, {
-              xaxis: { range: initialXRange },
-              ...updatedLayout
-          });
-        }
-
-        document.getElementById('dataRange2').addEventListener('input', updateChart2);
-        updateChart2();
-
-        var chartData = {{ requested_files_chart|safe }}['data'];
-        // console.log(chartData)
-        var getrequests = []
-        var getHits = []
-        var postrequests = []
-        var postHits = []
-        var headrequests = []
-        var headHits = []
-        var optionsrequests = []
-        var optionsHits = []
-        if(chartData.length >= 1){
-          getrequests = chartData[0].x;
-          getHits = chartData[0].y;
-        }
-        if(chartData.length >= 2){
-          postrequests = chartData[1].x;
-          postHits = chartData[1].y;
-        }
-        if(chartData.length >= 3){
-          headrequests = chartData[2].x;
-          headHits = chartData[2].y;
-        }
-        if(chartData.length >= 4){
-          optionsrequests = chartData[3].x;
-          optionsHits = chartData[3].y;
-        }
-
-        var requestToHitsMap = {};
-
-        for (var i = 0; i < getrequests.length; i++) {
-            var request = getrequests[i];
-            requestToHitsMap[request] = {
-                TotalHits: 0,
-                GetHits: getHits[i],
-                PostHits: 0,
-                HeadHits: 0,
-                OptionsHits: 0,
-            };
-        }
-
-        for (var i = 0; i < postrequests.length; i++) {
-            var request = postrequests[i];
-            if (request in requestToHitsMap) {
-                requestToHitsMap[request].PostHits = postHits[i];
             }
-        }
 
-        for (var i = 0; i < headrequests.length; i++) {
-            var request = headrequests[i];
-            if (request in requestToHitsMap) {
-                requestToHitsMap[request].HeadHits = headHits[i];
+            // Function to remove the onclick event
+            function removeClickEvent() {
+            const blurrDiv = document.getElementById("blurr");
+
+            if (blurrDiv.onclick) {
+                blurrDiv.onclick = null;
             }
-        }
-
-        for (var i = 0; i < optionsrequests.length; i++) {
-            var request = optionsrequests[i];
-            if (request in requestToHitsMap) {
-                requestToHitsMap[request].OptionsHits = optionsHits[i];
             }
-        }
 
-        Object.keys(requestToHitsMap).forEach(function (request) {
-            var hits = requestToHitsMap[request];
-            requestToHitsMap[request].TotalHits = hits.GetHits + hits.PostHits + hits.HeadHits + hits.OptionsHits;
-        });
-
-        // Convert the dictionary to an array of objects
-        var tableRows = Object.keys(requestToHitsMap).map(function (request) {
-            var hits = requestToHitsMap[request];
-            return {
-                Requests: request,
-                TotalHits: hits.TotalHits,
-                GetHits: hits.GetHits,
-                PostHits: hits.PostHits,
-                HeadHits: hits.HeadHits,
-                OptionsHits: hits.OptionsHits,
-            };
-        });
-
-        var table = new Tabulator("#table-container2", {
-            data: tableRows,
-            layout: "fitDataFill",
-            columns: [
-                { title: "Requests", field: "Requests", width: "20%" },
-                { title: "Total Hits", field: "TotalHits", width: "16%" },
-                { title: "GET Hits", field: "GetHits", width: "16%" },
-                { title: "POST Hits", field: "PostHits", width: "16%" },
-                { title: "HEAD Hits", field: "HeadHits", width: "16%" },
-                { title: "OPTIONS Hits", field: "OptionsHits", width: "16%" },
-            ],
-            pagination: "local",
-            paginationSize: 10,
-            paginationSizeSelector: [10, 20, 50, 100],
-            movableColumns: true,
-            rowFormatter: function (row) {
-                row.getElement().classList.add('dark:bg-gray-800', 'dark:text-gray-100', 'dark:hover:text-black');
-            }
-        });
-
-        document.getElementById("row-count2").addEventListener("input", function () {
-            var rowCount = parseInt(this.value);
-            table.setPageSize(rowCount);
-        });
-      </script>
-
-      <script>
-        var chartLayout = {
-            paper_bgcolor: 'white',
-            plot_bgcolor: 'white',
-            title: 'Visitors Per Hour',
-            xaxis: { title: 'Timestamp' },
-            yaxis: { title: 'Visitors' },
-        };
-
-        Plotly.newPlot('visitors_per_hour', {{ visitors_per_hour|safe }}['data'], chartLayout);
-
-        function updateChart1() {
-            var color = darkmode ? '#1a202c':'white';
-            var updatedLayout = {
-                paper_bgcolor: color,
-                plot_bgcolor: color,
-                font: {
-                  color: darkmode ? 'white':'black'
-                },
-                xaxis: {
-                  title: 'Timestamp'
-              },
-              yaxis: {
-                  title: 'Visitors'
-              },
-            };
-              var selectedDataPoints = parseInt(document.getElementById('dataRange1').value);
-
-            var initialXRange = [
-                {{ visitors_per_hour|safe }}['data'][0].x[0],
-                {{ visitors_per_hour|safe }}['data'][0].x[selectedDataPoints - 1]
-            ];
-
-            var updatedTrace = {
-                x: {{ visitors_per_hour|safe }}['data'][0].x.slice(0, selectedDataPoints),
-                y: {{ visitors_per_hour|safe }}['data'][0].y.slice(0, selectedDataPoints),
-                mode: 'lines+markers',
-                fill: 'tozeroy',
-                line: { shape: 'spline', smoothing: 1.3 },
-                marker: { size: 8, symbol: 'circle' },
-                fillcolor: 'rgba(0, 5, 255,0.2)',
-            };
-
-            Plotly.react('visitors_per_hour', [updatedTrace], { xaxis: { range: initialXRange }, ...updatedLayout, animate: {
-              duration: 5000,
-              easing: 'cubic-in-out'
-          } });
-        }
-
-        document.getElementById('dataRange1').addEventListener('input', updateChart1);
-        updateChart1();
-
-        document.addEventListener("DOMContentLoaded", function() {
-          var tableData = {{ visitors_per_hour|safe }}['data'][0];
-
-          var timestamp = tableData.x;
-          var visitors = tableData.y;
-
-          var tableRows = timestamp.map(function(_, i) {
-              return {
-                  Timestamp: timestamp[i],
-                  Visitors: visitors[i],
-                  AverageVisitors: calculateAverage(visitors, i)
-              };
-          });
-
-          var table = new Tabulator("#table-container1", {
-              data: tableRows,
-              layout: "fitDataFill",
-              columns: [
-                  { title: "Timestamp", field: "Timestamp", width: "50%" },
-                  { title: "Visitors", field: "Visitors", width: "25%" },
-                  { title: "Average Visitors", field: "AverageVisitors", width: "25%" }
-              ],
-              pagination: "local",
-              paginationSize: 10,
-              paginationSizeSelector: [10, 20, 50, 100],
-              movableColumns: true,
-              rowFormatter: function (row) {
-                row.getElement().classList.add('dark:bg-gray-800','dark:text-gray-100','dark:hover:text-black');
-              }
-          });
-          document.getElementById("row-count").addEventListener("input", function() {
-            var rowCount = parseInt(this.value);
-            table.setPageSize(rowCount);
-          });
-
-          function calculateAverage(visitors, index) {
-            var totalVisitors = 0;
-            var numEntries = 0;
-            for (var i = index; i >= 0; i--) {
-              totalVisitors += visitors[i];
-              numEntries++;
-            }
-            return (totalVisitors / numEntries).toFixed(2);
-          }
-        });
-      </script>
-
-      <script>
-          $(document).ready(function () {
-            $('#logs_table').DataTable({
-                data: {{ data|safe }},
-                columns: [
-                    {% for column in columns %}
-                    { data: '{{ column }}'},
-                    {% endfor %}
-                ],
-                paging: true,
-                searching: true,
-                ordering: true,
-                info: true,
-                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-                dom: '<"flex p-4 justify-between items-center space-x-4 outline-none transition-all duration-700 bg-gray-200 dark:bg-gray-700 text-white"<"my-custom-searchbox"f><"my-custom-length"l>><t<"bottom"p>>',
-                drawCallback: function () {
-                    var cells = document.querySelectorAll('#logs_table tbody tr');
-                    var searchbox = document.getElementById('logs_table_filter').classList.add('dark:text-gray-100','text-black','transition-all','duration-700')
-                    var ordering = document.getElementById('logs_table_length').classList.add('dark:text-gray-100','text-black','transition-all','duration-700');
-                    cells.forEach(function (cell) {
-                        cell.classList.add('whitespace-nowrap', 'm-4', 'p-4', 'dark:text-gray-100', 'text-black','transition-all','duration-700',
-                            'font-semibold', 'dark:bg-gray-700');
-                    });
-
-                    table.columns().every(function () {
-                        this.autoFill();
-                    });
+            // Add click event to the settings button
+            document
+            .getElementById("drawer-settings")
+            .addEventListener("click", function () {
+                const blurrDiv = document.getElementById("blurr");
+                document.getElementById("blurr").classList.toggle("fixed");
+                if (!blurrDiv.onclick) {
+                addClickEvent();
+                } else {
+                removeClickEvent();
                 }
             });
-        });
-      </script>
-      <script>
-        const darkModePreference = localStorage.getItem("darkMode");
-        if (darkModePreference && darkModePreference == "true") {
-          document.getElementById("dark-check").click();
-        }
-        function toggleDarkMode() {
-          const body = document.body;
-          const html = document.documentElement;
-          if (body.classList.contains("dark")) {
-            darkmode = false;
-            localStorage.setItem("darkMode", "false");
-            body.classList.remove("dark");
-            html.classList.remove("dark");
+        </script>
+
+        <!-- Your existing content goes here -->
+        <div id="blurr" class="transform transition-all duration-500 mt-2">
+            <div class="transition-all duration-700 px-6 py-12 mx-auto max-w-8xl">
+            <div class="m-3 mt-5">
+                <svg fill="#000000" viewBox="0 0 24 24" id="dashboard-alt-2" xmlns="http://www.w3.org/2000/svg" class="float-left icon multi-color w-16 h-16 mr-4 -mt-3"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path id="secondary-fill" d="M20.74,14.48A8.89,8.89,0,0,1,17.51,20H6.23A8.89,8.89,0,0,1,3,14.48a9,9,0,0,1,17.74,0Z" style="fill: #2ca9bc; stroke-width: 2;"></path><path id="primary-stroke" d="M21,13a9,9,0,0,1-3.36,7H6.36A9,9,0,1,1,21,13Zm-9,1a1,1,0,1,0,1,1A1,1,0,0,0,12,14Zm4-5-4,6" style="fill: none; stroke: #000000; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></path></g></svg>
+                <h1
+                class="transition-all duration-700 text-4xl font-black text-black mb-8 dark:text-cyan-500"
+                >
+                DASHBOARD
+                    <div class="float-right">
+                    <button
+                        onclick="javascript:window.print()"
+                        class="download-button transform active:scale-95 bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 text-sm rounded-lg font-bold tracking-widest w-full"
+                    >
+                        <div class="flex justify-center items-center relative">
+                        <div class="svg-container">
+                            <!-- Download Icon -->
+                            <svg
+                            class="download-icon"
+                            width="18"
+                            height="22"
+                            viewBox="0 0 18 22"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            >
+                            <path
+                                class="download-arrow"
+                                d="M13 9L9 13M9 13L5 9M9 13V1"
+                                stroke="#F2F2F2"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                            <path
+                                d="M1 17V18C1 18.7956 1.31607 19.5587 1.87868 20.1213C2.44129 20.6839 3.20435 21 4 21H14C14.7956 21 15.5587 20.6839 16.1213 20.1213C16.6839 19.5587 17 18.7956 17 18V17"
+                                stroke="#F2F2F2"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                            </svg>
+                            <div class="download-loader text-white hidden"></div>
+                            <!-- Checked Icon -->
+                            <svg
+                            class="check-svg hidden"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            >
+                            <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20ZM15.1071 7.9071C15.4976 7.51658 15.4976 6.88341 15.1071 6.49289C14.7165 6.10237 14.0834 6.10237 13.6929 6.49289L8.68568 11.5001L7.10707 9.92146C6.71655 9.53094 6.08338 9.53094 5.69286 9.92146C5.30233 10.312 5.30233 10.9452 5.69286 11.3357L7.97857 13.6214C8.3691 14.0119 9.00226 14.0119 9.39279 13.6214L15.1071 7.9071Z"
+                                fill="white"
+                            />
+                            </svg>
+                        </div>
+                        <div class="button-copy pl-2 leading-none uppercase">
+                            DOWNLOAD REPORT
+                        </div>
+                        </div>
+                    </button>
+                    </div>
+            </div>
+            </h1>
+            <div
+                class="transition-all duration-700 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+            >
+                <!-- Total Requests Card -->
+                <div
+                class="transition-all duration-700 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2"
+                >
+                <span
+                    class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
+                    >Total Requests</span
+                >
+                <span
+                    class="transition-all duration-700 font-semibold text-gray-900 dark:text-gray-100 block text-3xl"
+                    >{{ total_requests }}</span
+                >
+                </div>
+
+                <!-- Valid Requests Card -->
+                <div
+                class="transition-all duration-700 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2"
+                >
+                <span
+                    class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
+                    >Valid Requests</span
+                >
+                <span
+                    class="transition-all duration-700 font-semibold text-green-600 dark:text-green-300 block text-3xl"
+                    >{{ valid_requests }}</span
+                >
+                </div>
+
+                <!-- Failed Requests Card -->
+                <div
+                class="transition-all duration-700 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2"
+                >
+                <span
+                    class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
+                    >Failed Requests</span
+                >
+                <span
+                    class="transition-all duration-700 font-semibold text-red-600 dark:text-red-300 block text-3xl"
+                    >{{ failed_requests }}</span
+                >
+                </div>
+
+                <!-- Unique Visitors Card -->
+                <div
+                class="transition-all duration-700 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2"
+                >
+                <span
+                    class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
+                    >Unique Visitors</span
+                >
+                <span
+                    class="transition-all duration-700 font-semibold text-indigo-600 dark:text-indigo-300 block text-3xl"
+                    >{{ unique_visitors }}</span
+                >
+                </div>
+
+                <!-- Number of Requested Files Card -->
+                <div
+                class="transition-all duration-700 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2"
+                >
+                <span
+                    class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
+                    >Number of Requested Files</span
+                >
+                <span
+                    class="transition-all duration-700 font-semibold text-blue-600 dark:text-blue-300 block text-3xl"
+                    >{{ num_requested_files }}</span
+                >
+                </div>
+
+                <!-- Referrers Card (if available) -->
+                {% if referrers != "" %}
+                <div
+                class="transition-all duration-700 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2"
+                >
+                <span
+                    class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
+                    >Referrers</span
+                >
+                <span
+                    class="transition-all duration-700 font-semibold text-purple-600 dark:text-purple-300 block text-3xl"
+                    >{{ referrers }}</span
+                >
+                </div>
+                {% endif %}
+
+                <!-- Log Size Card -->
+                <div
+                class="transition-all duration-700 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2"
+                >
+                <span
+                    class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
+                    >Log Size</span
+                >
+                <span
+                    class="transition-all duration-700 font-semibold text-yellow-600 dark:text-yellow-300 block text-3xl"
+                    >{{ log_size }} bytes</span
+                >
+                </div>
+            </div>
+
+            <div
+                id="data-table"
+                class="transition-all duration-700 bg-white rounded-lg shadow-md p-6 mt-8 overflow-x-auto dark:bg-gray-800"
+            >
+                <h2
+                class="transition-all duration-700 text-2xl font-semibold text-gray-900 mb-4 dark:text-gray-100"
+                >
+                Data Table
+                </h2>
+                <table
+                id="logs_table"
+                class="transition-all duration-700 table table-striped table-bordered"
+                >
+                <thead>
+                    <tr>
+                    {% for column in columns %}
+                    <th
+                        id="{{column}}"
+                        class="transition-all duration-700 px-6 py-3 dark:bg-gray-700 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-700 dark:text-gray-200 uppercase tracking-wider"
+                    >
+                        {{ column }}
+                    </th>
+                    {% endfor %}
+                    </tr>
+                </thead>
+                </table>
+            </div>
+
+            <div
+                id="visitors-timestamp"
+                class="transition-all duration-700 bg-white rounded-lg shadow-md p-6 mt-8 dark:bg-gray-800"
+            >
+                <h2
+                class="transition-all duration-700 text-2xl font-semibold text-gray-900 mb-4 dark:text-gray-100"
+                >
+                Visitors Per Hour
+                </h2>
+                <div id="visitors_per_hour"></div>
+                <div
+                class="transition-all duration-700 flex justify-end mt-4 mr-16 pb-4"
+                >
+                <div
+                    class="transition-all duration-700 panel p-4 border rounded-lg bg-gray-100 dark:bg-gray-600"
+                >
+                    <input
+                    class="transition-all duration-700 w-[700px] px-2 py-1 border rounded-md text-lg text-gray-900 dark:text-gray-100 dark:bg-gray-700"
+                    type="range"
+                    id="dataRange1"
+                    min="2"
+                    max="1000"
+                    step="1"
+                    value="20"
+                    oninput="document.getElementById('dataPointValue1').textContent = this.value;"
+                    />
+                    <div
+                    class="transition-all duration-700 text-gray-600 dark:text-gray-300 text-lg mt-2"
+                    >
+                    Data Points: <span id="dataPointValue1">20</span>
+                    </div>
+                </div>
+                </div>
+                <div class="container mx-auto mt-4 dark:bg-gray-800">
+                <div
+                    class="bg-white rounded-lg shadow-md p-4 mb-4 dark:bg-gray-800"
+                >
+                    <label
+                    for="row-count"
+                    class="text-gray-600 dark:text-gray-100 dark:bg-gray-800"
+                    >Number of Rows:</label
+                    >
+                    <input
+                    id="row-count"
+                    type="number"
+                    min="1"
+                    max="100"
+                    value="10"
+                    class="border rounded-md px-2 py-1 focus:outline-none focus:ring dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:border-blue-300"
+                    />
+                </div>
+
+                <div
+                    id="table-container1"
+                    class="dark:bg-gray-800 dark:text-gray-100"
+                ></div>
+                </div>
+            </div>
+            <div
+                id="files-hits"
+                class="transition-all duration-700 bg-white rounded-lg shadow-md p-6 mt-8 dark:bg-gray-800"
+            >
+                <h2
+                class="transition-all duration-700 text-2xl font-semibold text-gray-900 mb-4 dark:text-gray-100"
+                >
+                Requested Files (URLS)
+                </h2>
+                <div id="requested_files_chart"></div>
+
+                <div class="transition-all duration-700 flex justify-end mt-4 mr-16">
+                    <div
+                        class="transition-all duration-700 panel p-4 border rounded-lg bg-gray-100 dark:bg-gray-600"
+                    >
+                        <input
+                        class="transition-all duration-700 w-[700px] px-2 py-1 border rounded-md text-lg text-gray-900 dark:text-gray-100 dark:bg-gray-700"
+                        type="range"
+                        id="dataRange2"
+                        min="2"
+                        max="1000"
+                        step="1"
+                        value="10"
+                        oninput="document.getElementById('dataPointValue2').textContent = this.value;"
+                        />
+                        <div
+                        class="transition-all duration-700 text-gray-600 dark:text-gray-300 text-lg mt-2"
+                        >
+                        Data Points: <span id="dataPointValue2">10</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="container mx-auto mt-4 dark:bg-gray-800">
+                    <div
+                        class="bg-white rounded-lg shadow-md p-4 mb-4 dark:bg-gray-800"
+                    >
+                        <label
+                        for="row-count2"
+                        class="text-gray-600 dark:text-gray-100 dark:bg-gray-800"
+                        >Number of Rows:</label
+                        >
+                        <input
+                        id="row-count2"
+                        type="number"
+                        min="1"
+                        max="100"
+                        value="10"
+                        class="border rounded-md px-2 py-1 focus:outline-none focus:ring dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:border-blue-300"
+                        />
+                    </div>
+                    <div id="table-container2" class="dark:bg-gray-800 dark:text-gray-100"></div>
+                </div>
+            </div>
+
+
+            <div id="404-urls" class="transition-all duration-700 bg-white rounded-lg shadow-md p-6 mt-8 dark:bg-gray-800">
+                <h2 class="transition-all duration-700 text-2xl font-semibold text-gray-900 mb-4 dark:text-gray-100" >
+                Not Found URLs (404)
+                </h2>
+                <div id="not_found_urls_graph"></div>
+
+                <div class="transition-all duration-700 flex justify-end mt-4 mr-16">
+                    <div
+                        class="transition-all duration-700 panel p-4 border rounded-lg bg-gray-100 dark:bg-gray-600"
+                    >
+                        <input
+                        class="transition-all duration-700 w-[700px] px-2 py-1 border rounded-md text-lg text-gray-900 dark:text-gray-100 dark:bg-gray-700"
+                        type="range"
+                        id="dataRange3"
+                        min="2"
+                        max="1000"
+                        step="1"
+                        value="10"
+                        oninput="document.getElementById('dataPointValue3').textContent = this.value;"
+                        />
+                        <div
+                        class="transition-all duration-700 text-gray-600 dark:text-gray-300 text-lg mt-2"
+                        >
+                        Data Points: <span id="dataPointValue3">10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            <script>
+            $(document).ready(function () {
+                // Smooth scrolling for anchor links
+                $('a[href^="#"]').on("click", function (event) {
+                var target = $(this.getAttribute("href"));
+                if (target.length) {
+                    event.preventDefault();
+                    $("html, body").stop().animate(
+                    {
+                        scrollTop: target.offset().top,
+                    },
+                    1000
+                    );
+                }
+                });
+            });
+        </script>
+
+
+
+        <script>
+            var chartLayout1 = {
+                paper_bgcolor: 'white',
+                plot_bgcolor: 'white',
+                title: 'Visitors Per Hour',
+                xaxis: { title: 'Timestamp' },
+                yaxis: { title: 'Visitors' },
+            };
+
+            Plotly.newPlot('visitors_per_hour', {{ visitors_per_hour|safe }}['data'], chartLayout1);
+
+            function updateChart1() {
+                var color = darkmode ? '#1a202c':'white';
+                var updatedLayout = {
+                    paper_bgcolor: color,
+                    plot_bgcolor: color,
+                    font: {
+                        color: darkmode ? 'white':'black'
+                    },
+                    xaxis: {
+                        title: 'Timestamp'
+                    },
+                    yaxis: {
+                        title: 'Visitors'
+                    },
+                };
+                    var selectedDataPoints1 = parseInt(document.getElementById('dataRange1').value);
+
+                var initialXRange1 = [
+                    {{ visitors_per_hour|safe }}['data'][0].x[0],
+                    {{ visitors_per_hour|safe }}['data'][0].x[selectedDataPoints1 - 1]
+                ];
+
+                var updatedTrace1 = {
+                    x: {{ visitors_per_hour|safe }}['data'][0].x.slice(0, selectedDataPoints1),
+                    y: {{ visitors_per_hour|safe }}['data'][0].y.slice(0, selectedDataPoints1),
+                    mode: 'lines+markers',
+                    fill: 'tozeroy',
+                    line: { shape: 'spline', smoothing: 1.3 },
+                    marker: { size: 8, symbol: 'circle' },
+                    fillcolor: 'rgba(0, 5, 255,0.2)',
+                };
+
+                Plotly.react('visitors_per_hour', [updatedTrace1], { xaxis: { range: initialXRange1 }, ...updatedLayout, animate: {
+                    duration: 5000,
+                    easing: 'cubic-in-out'
+                } });
+            }
+
+            document.getElementById('dataRange1').addEventListener('input', updateChart1);
             updateChart1();
+
+            document.addEventListener("DOMContentLoaded", function() {
+                var tableData = {{ visitors_per_hour|safe }}['data'][0];
+
+                var timestamp = tableData.x;
+                var visitors = tableData.y;
+
+                var tableRows = timestamp.map(function(_, i) {
+                    return {
+                        Timestamp: timestamp[i],
+                        Visitors: visitors[i],
+                        AverageVisitors: calculateAverage(visitors, i)
+                    };
+                });
+
+                var table = new Tabulator("#table-container1", {
+                    data: tableRows,
+                    layout: "fitDataFill",
+                    columns: [
+                        { title: "Timestamp", field: "Timestamp", width: "50%" },
+                        { title: "Visitors", field: "Visitors", width: "25%" },
+                        { title: "Average Visitors", field: "AverageVisitors", width: "25%" }
+                    ],
+                    pagination: "local",
+                    paginationSize: 10,
+                    paginationSizeSelector: [10, 20, 50, 100],
+                    movableColumns: true,
+                    rowFormatter: function (row) {
+                    row.getElement().classList.add('dark:bg-gray-800','dark:text-gray-100','dark:hover:text-black');
+                    }
+                });
+                document.getElementById("row-count").addEventListener("input", function() {
+                var rowCount = parseInt(this.value);
+                table.setPageSize(rowCount);
+                });
+
+                function calculateAverage(visitors, index) {
+                var totalVisitors = 0;
+                var numEntries = 0;
+                for (var i = index; i >= 0; i--) {
+                    totalVisitors += visitors[i];
+                    numEntries++;
+                }
+                return (totalVisitors / numEntries).toFixed(2);
+                }
+            });
+            </script>
+
+
+
+            <script>
+            // Define your chart layout with the gray background color
+            var chartLayout = {
+                // Set background colors based on dark mode state
+                paper_bgcolor: 'white',
+                plot_bgcolor: 'white',
+                title: 'Requested files (URLS)',
+                xaxis: { title: 'Requested files' },
+                yaxis: { title: 'Number of Hits' },
+                xaxis_tickangle: -45
+            };
+
+            // Create the Plotly graph with the provided data and layout
+            var chartData2 = {{ requested_files_chart|safe }}['data'];
+            Plotly.newPlot('requested_files_chart', chartData2, chartLayout);
+
+            // Store the original chart data and layout
+            var originalChartData = chartData2;
+            var originalChartLayout = chartLayout;
+
+            function updateChart2() {
+                var color = darkmode ? '#1a202c':'white';
+                var updatedLayout = {
+                    paper_bgcolor: color,
+                    plot_bgcolor: color,
+                    font: {
+                        color: darkmode ? 'white':'black' // Specify the desired font color (e.g., black)
+                    },
+                    xaxis: {
+                        title: 'Requests'
+                    },
+                    yaxis: {
+                        title: 'Hits'
+                    },
+                    xaxis_tickangle: -45
+                };
+                let selectedDataPoints2 = parseInt(document.getElementById('dataRange2').value);
+
+                // Ensure selectedDataPoints2 is within a valid range
+                selectedDataPoints2 = Math.min(Math.max(selectedDataPoints2, 0), originalChartData[0].x.length);
+
+                const initialXRange2 = [
+                    originalChartData[0].x[0],
+                    originalChartData[0].x[selectedDataPoints2 - 1]
+                ];
+
+                const updatedTrace2 = originalChartData.map(function (data) {
+                return {
+                    x: data.x.slice(0, selectedDataPoints2),
+                    y: data.y.slice(0, selectedDataPoints2),
+                    type: 'bar',
+                    marker: {
+                        color: data.marker.color.slice(0, selectedDataPoints2),
+                    },
+                    name: data.name
+                }
+                });
+
+                Plotly.react('requested_files_chart', updatedTrace2, {
+                    xaxis: { range: initialXRange2 },
+                    ...updatedLayout
+                });
+            }
+
+            document.getElementById('dataRange2').addEventListener('input', updateChart2);
             updateChart2();
-          } else {
-            darkmode = true;
-            localStorage.setItem("darkMode", "true");
-            body.classList.add("dark");
-            html.classList.add("dark");
-            updateChart1();
-            updateChart2();
-          }
-        }
-      </script>
-    </div>
-  </body>
+
+            //var chartData2 = {{ requested_files_chart|safe }}['data'];
+            // console.log(chartData2)
+            var getrequests = []
+            var getHits = []
+            var postrequests = []
+            var postHits = []
+            var headrequests = []
+            var headHits = []
+            var optionsrequests = []
+            var optionsHits = []
+            if(chartData2.length >= 1){
+                getrequests = chartData2[0].x;
+                getHits = chartData2[0].y;
+            }
+            if(chartData2.length >= 2){
+                postrequests = chartData2[1].x;
+                postHits = chartData2[1].y;
+            }
+            if(chartData2.length >= 3){
+                headrequests = chartData2[2].x;
+                headHits = chartData2[2].y;
+            }
+            if(chartData2.length >= 4){
+                optionsrequests = chartData2[3].x;
+                optionsHits = chartData2[3].y;
+            }
+
+            var requestToHitsMap = {};
+
+            for (var i = 0; i < getrequests.length; i++) {
+                var request = getrequests[i];
+                requestToHitsMap[request] = {
+                    TotalHits: 0,
+                    GetHits: getHits[i],
+                    PostHits: 0,
+                    HeadHits: 0,
+                    OptionsHits: 0,
+                };
+            }
+
+            for (var i = 0; i < postrequests.length; i++) {
+                var request = postrequests[i];
+                if (request in requestToHitsMap) {
+                    requestToHitsMap[request].PostHits = postHits[i];
+                }
+            }
+
+            for (var i = 0; i < headrequests.length; i++) {
+                var request = headrequests[i];
+                if (request in requestToHitsMap) {
+                    requestToHitsMap[request].HeadHits = headHits[i];
+                }
+            }
+
+            for (var i = 0; i < optionsrequests.length; i++) {
+                var request = optionsrequests[i];
+                if (request in requestToHitsMap) {
+                    requestToHitsMap[request].OptionsHits = optionsHits[i];
+                }
+            }
+
+            Object.keys(requestToHitsMap).forEach(function (request) {
+                var hits = requestToHitsMap[request];
+                requestToHitsMap[request].TotalHits = hits.GetHits + hits.PostHits + hits.HeadHits + hits.OptionsHits;
+            });
+
+            // Convert the dictionary to an array of objects
+            var tableRows = Object.keys(requestToHitsMap).map(function (request) {
+                var hits = requestToHitsMap[request];
+                return {
+                    Requests: request,
+                    TotalHits: hits.TotalHits,
+                    GetHits: hits.GetHits,
+                    PostHits: hits.PostHits,
+                    HeadHits: hits.HeadHits,
+                    OptionsHits: hits.OptionsHits,
+                };
+            });
+
+            var table = new Tabulator("#table-container2", {
+                data: tableRows,
+                layout: "fitDataFill",
+                columns: [
+                    { title: "Requests", field: "Requests", width: "20%" },
+                    { title: "Total Hits", field: "TotalHits", width: "16%" },
+                    { title: "GET Hits", field: "GetHits", width: "16%" },
+                    { title: "POST Hits", field: "PostHits", width: "16%" },
+                    { title: "HEAD Hits", field: "HeadHits", width: "16%" },
+                    { title: "OPTIONS Hits", field: "OptionsHits", width: "16%" },
+                ],
+                pagination: "local",
+                paginationSize: 10,
+                paginationSizeSelector: [10, 20, 50, 100],
+                movableColumns: true,
+                rowFormatter: function (row) {
+                    row.getElement().classList.add('dark:bg-gray-800', 'dark:text-gray-100', 'dark:hover:text-black');
+                }
+            });
+
+            document.getElementById("row-count2").addEventListener("input", function () {
+                var rowCount = parseInt(this.value);
+                table.setPageSize(rowCount);
+            });
+            </script>
+
+            
+            <script>
+                // Assuming you have a <div> with an id "chart" where you want to render the graph
+                var chartDiv = 'not_found_urls_graph';
+            
+                // Parse the JSON data
+                var logsData = {{data|safe}};
+            
+                // Create a layout for the chart using initialXRange3
+                var color = darkmode ? '#1a202c' : 'white';
+                var layout3 = {
+                    paper_bgcolor: color,
+                    plot_bgcolor: color,
+                    font: {
+                        color: darkmode ? 'white' : 'black'
+                    },
+                    xaxis: {
+                        title: 'Paths'
+                    },
+                    yaxis: {
+                        title: '404 Hits',
+                        tickmode: 'linear',
+                        dtick: 1, 
+                    },
+                    xaxis_tickangle: -45
+                };
+            
+                // Convert the JSON data to an array of objects
+                Plotly.newPlot(chartDiv, logsData, layout3);
+            
+                function updateChart3() {
+                    var color = darkmode ? '#1a202c' : 'white';
+                    var updatedLayout3 = {
+                        paper_bgcolor: color,
+                        plot_bgcolor: color,
+                        font: {
+                            color: darkmode ? 'white' : 'black'
+                        },
+                        xaxis: {
+                            title: 'Paths'
+                        },
+                        yaxis: {
+                            title: '404 Hits',
+                            tickmode: 'linear',
+                            dtick: 1,
+                            width: 1
+                        },
+                        xaxis_tickangle: -45
+                    };
+            
+                    let selectedDataPoints3 = parseInt(document.getElementById('dataRange3').value);
+                    selectedDataPoints3 = Math.min(Math.max(selectedDataPoints3, 0), logsData.length);
+                    const initialXRange3 = [
+                        logsData[0].request,
+                        logsData[selectedDataPoints3 - 1].request
+                    ];
+                    console.log(selectedDataPoints3)
+                    console.log(initialXRange3)
+                    var pathCounts = {};
+                    logsData.forEach(function (log) {
+                        var path = log.request;
+                        if (log.status === '404') {
+                            if (pathCounts[path]) {
+                                pathCounts[path]++;
+                            } else {
+                                pathCounts[path] = 1;
+                            }
+                        }
+                    });
+            
+                    let paths = Object.keys(pathCounts);
+                    let hitCounts = Object.values(pathCounts);
+                    console.log(paths.slice(0, selectedDataPoints3))
+                    const updatedTrace3 = [{
+                        x: paths.slice(0, selectedDataPoints3),
+                        y: hitCounts.slice(0, selectedDataPoints3),
+                        type: 'bar',
+                        marker: {
+                            color: '#BF000C'
+                        },
+                        name: 'New Graph'
+                    }];
+            
+                    Plotly.react(chartDiv, updatedTrace3, {
+                        xaxis: { range: initialXRange3 },
+                        ...updatedLayout3
+                    });
+                }
+                // Add an event listener to the "dataRange3" input element using the "input" event
+                document.getElementById('dataRange3').addEventListener('input', updateChart3);
+            
+                // Initialize the chart
+                updateChart3();
+            </script>
+            
+
+
+            <script>
+                $(document).ready(function () {
+                $('#logs_table').DataTable({
+                    data: {{ data|safe }},
+                    columns: [
+                        {% for column in columns %}
+                            { data: '{{ column }}'},
+                        {% endfor %}
+                    ],
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    info: true,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    dom: '<"flex p-4 justify-between items-center space-x-4 outline-none transition-all duration-700 bg-gray-200 dark:bg-gray-700 text-white"<"my-custom-searchbox"f><"my-custom-length"l>><t<"bottom"p>>',
+                    drawCallback: function () {
+                        var cells = document.querySelectorAll('#logs_table tbody tr');
+                        var searchbox = document.getElementById('logs_table_filter').classList.add('dark:text-gray-100','text-black','transition-all','duration-700')
+                        var ordering = document.getElementById('logs_table_length').classList.add('dark:text-gray-100','text-black','transition-all','duration-700');
+                        cells.forEach(function (cell) {
+                            cell.classList.add('whitespace-nowrap', 'm-4', 'p-4', 'dark:text-gray-100', 'text-black','transition-all','duration-700',
+                                'font-semibold', 'dark:bg-gray-700');
+                        });
+
+                        table.columns().every(function () {
+                            this.autoFill();
+                        });
+                    }
+                });
+            });
+            </script>
+            <script>
+            const darkModePreference = localStorage.getItem("darkMode");
+            if (darkModePreference && darkModePreference == "true") {
+                document.getElementById("dark-check").click();
+            }
+            function toggleDarkMode() {
+                const body = document.body;
+                const html = document.documentElement;
+                if (body.classList.contains("dark")) {
+                darkmode = false;
+                localStorage.setItem("darkMode", "false");
+                body.classList.remove("dark");
+                html.classList.remove("dark");
+                updateChart1();
+                updateChart2();
+                updateChart3();
+                } else {
+                darkmode = true;
+                localStorage.setItem("darkMode", "true");
+                body.classList.add("dark");
+                html.classList.add("dark");
+                updateChart1();
+                updateChart2();
+                updateChart3();
+                }
+            }
+            </script>
+        </div>
+    </body>
 </html>

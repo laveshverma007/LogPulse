@@ -16,10 +16,11 @@ MAX_FILE_SIZE = 10*1024*1024
 Session(app)
 
 ALLOWED_EXTENSIONS = {'txt', 'log'}
-app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['UPLOAD_FOLDER'] = '/home/lavesh/Projects/LogPulse/Tool/uploads'
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
+
 
 def detect_log_format(log_file_path):
     common_log_pattern = r'^\S+ \S+ \S+ \[[^\]]+\] ".+" \d+ \d+'
@@ -36,24 +37,25 @@ def detect_log_format(log_file_path):
 
 def allowed_file(filename):
     parts = filename.split('.')
-    if(len(parts) > 1):
+    if (len(parts) > 1):
         file_extension = filename.split('.')[-1].lower()
         return file_extension in ALLOWED_EXTENSIONS
     return True
+
 
 def create_df(log_file_path):
     log_format = detect_log_format(log_file_path)
     logger.info(f'Detected log format: {log_format}')
     os.system('rm -rf access_logs.parquet log_errors.csv')
     adv.logs_to_df(log_file=log_file_path,
-                output_file='access_logs.parquet',
-                errors_file='log_errors.csv',
-                log_format=log_format,
-                fields=None)
+                   output_file='access_logs.parquet',
+                   errors_file='log_errors.csv',
+                   log_format=log_format,
+                   fields=None)
 
     logs_df = pd.read_parquet('access_logs.parquet')
     logs_df['datetime'] = pd.to_datetime(logs_df['datetime'],
-                                        format='%d/%b/%Y:%H:%M:%S %z')
+                                         format='%d/%b/%Y:%H:%M:%S %z')
 
     logs_df['datetime'] = logs_df['datetime'].dt.strftime('%d/%b/%Y:%H:%M:%S')
 
@@ -69,23 +71,25 @@ def create_df(log_file_path):
 def generate_random_filename(content):
     return hashlib.md5(content).hexdigest()
 
-def requested_files(max_points_to_display,logs_df):
+
+def requested_files(max_points_to_display, logs_df):
     requested_files_count = logs_df.groupby(
         ['request', 'method']).size().reset_index(name='count')
     requested_files_count = requested_files_count.sort_values(
         by='count', ascending=False)
     fig = px.bar(requested_files_count.head(max_points_to_display), x='request', y='count', color='method',
-                labels={'request': 'Request', 'count': 'Number of Requests', 'method': 'Method'})
+                 labels={'request': 'Request', 'count': 'Number of Requests', 'method': 'Method'})
     return fig.to_json()
 
-@app.route('/', methods=['GET','POST'])
+
+@app.route('/', methods=['GET', 'POST'])
 def dashboard():
     if request.method == 'POST':
         f = request.files['file']
         if f and allowed_file(f.filename):
             content = f.read()
             f.seek(0)
-            print("content :",content)
+            print("content :", content)
             random_filename = generate_random_filename(content)
             extension = 'txt'
             new_filename = random_filename + '.' + extension
@@ -101,26 +105,27 @@ def dashboard():
             error = "File not found."
         return render_template('dashboard.html', error=error)
     error = flash('error')
-    print("error: ",error)
-    return render_template('dashboard.html',error=error)
+    print("error: ", error)
+    return render_template('dashboard.html', error=error)
+
 
 @app.route('/uploads/<filename>')
 def serve_file(filename):
-    return send_from_directory('uploads', filename)
+    return send_from_directory('/home/lavesh/Projects/LogPulse/Tool/uploads', filename)
 
 
 @app.route('/reports/<report>', methods=['GET'])
 def reports(report):
     flag = 0
-    for filename in os.listdir('uploads'):
+    for filename in os.listdir('/home/lavesh/Projects/LogPulse/Tool/uploads'):
         if os.path.splitext(filename)[0] == report:
             flag = 1
             file_extension = os.path.splitext(filename)[1].lower()
             break
-    if(not flag):
+    if (not flag):
         return "<script>document.location='/'</script>"
     full_name = report + file_extension
-    log_file_path = f'uploads/{full_name}'
+    log_file_path = f'/home/lavesh/Projects/LogPulse/Tool/uploads/{full_name}'
     logs_df, visitors_in_hour, step_size = create_df(log_file_path)
     log_format = detect_log_format(log_file_path)
     max_points_to_display = 1000
@@ -152,24 +157,24 @@ def reports(report):
 
     visitors_per_hour = fig.to_json()
 
-    requested_files_chart = requested_files(max_points_to_display,logs_df)
+    requested_files_chart = requested_files(max_points_to_display, logs_df)
 
     file_extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'ico', 'tiff', 'svg', 'webp',  # Image files
-                    'css', 'scss', 'less', 'sass', 'styl',  # Stylesheets
-                    'js', 'jsx', 'ts', 'tsx', 'coffee', 'dart',  # Script files
-                    'html', 'htm', 'php', 'asp', 'jsp', 'xml', 'xhtml',  # Webpage files
-                    'pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'csv', 'txt',  # Document files
-                    'mp3', 'wav', 'ogg', 'flac', 'aac', 'wma',  # Audio files
-                    'mp4', 'avi', 'wmv', 'flv', 'mkv', 'mov', 'webm',  # Video files
-                    # Archive files
-                    'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'pkg', 'deb', 'rpm', 'msi', 'dmg',
-                    'exe', 'msi', 'bat', 'sh', 'cmd', 'ps1',  # Executable files
-                    'json', 'xml', 'yaml', 'yml', 'toml',  # Configuration files
-                    'log', 'ini', 'conf', 'cfg', 'env',  # Configuration files
-                    # Database and data files
-                    'sql', 'db', 'sqlite', 'mdb', 'accdb', 'dbf', 'csv', 'tsv', 'jsonl',
-                    'svg', 'eps', 'ps', 'ai',  # Vector graphic files
-                    'ttf', 'otf', 'woff', 'woff2', 'eot', 'fon']  # Font files
+                       'css', 'scss', 'less', 'sass', 'styl',  # Stylesheets
+                       'js', 'jsx', 'ts', 'tsx', 'coffee', 'dart',  # Script files
+                       'html', 'htm', 'php', 'asp', 'jsp', 'xml', 'xhtml',  # Webpage files
+                       'pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'csv', 'txt',  # Document files
+                       'mp3', 'wav', 'ogg', 'flac', 'aac', 'wma',  # Audio files
+                       'mp4', 'avi', 'wmv', 'flv', 'mkv', 'mov', 'webm',  # Video files
+                       # Archive files
+                       'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'pkg', 'deb', 'rpm', 'msi', 'dmg',
+                       'exe', 'msi', 'bat', 'sh', 'cmd', 'ps1',  # Executable files
+                       'json', 'xml', 'yaml', 'yml', 'toml',  # Configuration files
+                       'log', 'ini', 'conf', 'cfg', 'env',  # Configuration files
+                       # Database and data files
+                       'sql', 'db', 'sqlite', 'mdb', 'accdb', 'dbf', 'csv', 'tsv', 'jsonl',
+                       'svg', 'eps', 'ps', 'ai',  # Vector graphic files
+                       'ttf', 'otf', 'woff', 'woff2', 'eot', 'fon']  # Font files
     num_requested_files = logs_df['request'].str.extract(
         r'(\S+\.(?:' + '|'.join(file_extensions) + r'))', expand=False).nunique()
     total_requests = len(logs_df)
@@ -179,14 +184,14 @@ def reports(report):
     failed_requests = total_requests - valid_requests
     unique_visitors = logs_df['client'].nunique()
     referrers = "" if log_format == 'common' else logs_df[logs_df['referer']
-                                                        != '-']['referer'].nunique()
+                                                          != '-']['referer'].nunique()
     log_size = os.path.getsize(log_file_path)
 
     return render_template('apache.html', num_requested_files=num_requested_files, visitors_per_hour=visitors_per_hour, columns=columns, data=logs_json, total_requests=total_requests, valid_requests=valid_requests,
-                        failed_requests=failed_requests, unique_visitors=unique_visitors, referrers=referrers,
-                        log_size=log_size, requested_files_chart=requested_files_chart)
+                           failed_requests=failed_requests, unique_visitors=unique_visitors, referrers=referrers,
+                           log_size=log_size, requested_files_chart=requested_files_chart)
 
 
 if __name__ == '__main__':
-    app.run(debug=True,port=3000)
+    app.run(debug=True, port=3000)
     os.system('rm -rf access_logs.parquet log_errors.csv')
