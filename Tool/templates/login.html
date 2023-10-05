@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -280,82 +279,11 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-    <script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-auth-compat.js"></script>
-    <!-- <script src="https://www.gstatic.com/firebasejs/5.0.1/firebase-auth.js"></script> -->
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyC13RCpuXh84gLwaCSSG-OWXfhi4EfMqK4",
-            authDomain: "loganalyzer-2663e.firebaseapp.com",
-            projectId: "loganalyzer-2663e",
-            storageBucket: "loganalyzer-2663e.appspot.com",
-            messagingSenderId: "181868143645",
-            appId: "1:181868143645:web:0ace10a298bfda9c2492f4"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-
-        const auth = firebase.auth();
-
-        function signUp(name, email, password, confirmPassword) {
-            if (password !== confirmPassword) {
-                const errorMessageElement = document.getElementById('signMessage');
-                errorMessageElement.innerText = "Passwords do not match. Please enter matching passwords.";
-                errorMessageElement.style.color = "red";
-                return;
-            }
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    console.log("User signed up:", user);
-                    document.getElementById('signMessage').innerText = "";
-                })
-                .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    console.error("Signup error:", errorCode, errorMessage);
-                    const errorMessageElement = document.getElementById('signMessage');
-                    errorMessageElement.innerText = "Error creating account. Please try again.";
-                    errorMessageElement.style.color = "red";
-                    errorMessageElement.style.fontWeight = "bold";
-                });
-        }
-
-
-        function signIn(email, password) {
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Signed in 
-                    const user = userCredential.user;
-                    console.log(user)
-                    document.getElementById('errorMessage').innerText = "";
-                })
-                .catch((error) => {
-                    console.log(email, password)
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    console.log(errorMessage)
-                    document.getElementById('errorMessage').innerText = "Invalid login credentials. Please try again.";
-                });
-
-        }
-
-        function signOut() {
-            auth.signOut().then(() => {
-                console.log("User signed out");
-            }).catch((error) => {
-
-                console.error("Sign-out error:", error);
-            });
-        }
-    </script>
 </head>
-
 <body>
     <button id="darkModeToggle">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
+        stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="5" />
             <line x1="12" y1="1" x2="12" y2="3" />
             <line x1="12" y1="21" x2="12" y2="23" />
@@ -369,38 +297,33 @@
     </button>
     <div class="container" id="container">
         <div class="form-container sign-up-container">
-            <form
-                onsubmit="event.preventDefault(); signUp(name.value, email.value, password.value, confirmPassword.value);">
+            {% if register %}
+                <script>
+                    document.getElementById('container').classList.add("right-panel-active");
+                </script>
+            {% endif %}
+            <form action="/register" method="POST">
                 <h1>Create Account</h1>
-                <div class="social-container">
-                    <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-                    <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
-                </div>
-                <span>or use your email for registration</span>
-                <input type="text" placeholder="Name" />
-                <input id="email" type="email" placeholder="Email" />
-                <input id="password" type="password" placeholder="Password" />
-                <input type="password" id="confirmPassword" placeholder="Confirm Password" /> <!-- New field -->
+                <input type="text" placeholder="Name" name="name"/>
+                <input id="email" type="email" placeholder="Email" name="email" />
+                <input id="password" type="password" placeholder="Password" name="password" />
+                <input type="password" id="confirmPassword" placeholder="Confirm Password" name="confirm" /> <!-- New field -->
                 <button type="submit">Sign Up</button>
-                <div id="signMessage" style="color: red;"></div>
+                {% if error2 %}
+                <div id="errorMessage2" style="color: red; margin-top: 4">{{ error2 }}</div>
+                {% endif %}
             </form>
         </div>
         <div class="form-container sign-in-container">
-            <form
-                onsubmit="event.preventDefault(); signIn(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);">
+            <form action="/login" method="POST">
                 <h1>Sign in</h1>
-                <div class="social-container">
-                    <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-                    <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
-                </div>
-                <span>or use your account</span>
-                <input type="email" id="loginEmail" placeholder="Email" />
-                <input type="password" id="loginPassword" placeholder="Password" />
+                <input type="email" id="loginEmail" placeholder="Email" name="email"/>
+                <input type="password" id="loginPassword" placeholder="Password" name="password"/>
                 <a href="#">Forgot your password?</a>
                 <button type="submit">Sign In</button>
-                <div id="errorMessage" style="color: red;"></div>
+                {% if error %}
+                    <div id="errorMessage" style="color: red; margin-top: 2">{{ error }}</div>
+                {% endif %}
             </form>
         </div>
         <div class="overlay-container">
@@ -419,16 +342,11 @@
         </div>
     </div>
 
-    <div>
-        <button onclick="signOut()">Sign Out</button>
-    </div>
-
     <script>
         const signUpButton = document.getElementById('signUp');
         const signInButton = document.getElementById('signIn');
         const container = document.getElementById('container');
         const darkModeToggle = document.getElementById('darkModeToggle');
-
         signUpButton.addEventListener('click', () => {
             container.classList.add("right-panel-active");
         });
@@ -441,5 +359,4 @@
         });
     </script>
 </body>
-
 </html>

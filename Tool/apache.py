@@ -1,6 +1,6 @@
 import advertools as adv
 import pandas as pd
-from flask import Flask, render_template, request, send_from_directory, redirect, url_for, flash
+from flask import Flask, render_template, request, send_from_directory, redirect, url_for, flash, session
 from flask_session import Session
 import os
 import plotly.express as px
@@ -8,10 +8,22 @@ import hashlib
 from loguru import logger
 import re
 import plotly.graph_objs as go
+from flask import Flask, render_template, redirect, url_for, request
+import sqlite3
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_bcrypt import Bcrypt
+from functools import wraps
+
+
 
 app = Flask(__name__)
 app.secret_key = "SECRET_KEY_INTERESTING"
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
 app.config['SESSION_TYPE'] = 'filesystem'
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+bcrypt = Bcrypt(app)
 MAX_FILE_SIZE = 10*1024*1024
 Session(app)
 
@@ -20,6 +32,42 @@ app.config['UPLOAD_FOLDER'] = './uploads'
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
+
+
+conn = sqlite3.connect('posts.db')
+cursor = conn.cursor()
+create_table_query = '''
+    CREATE TABLE IF NOT EXISTS user (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        email TEXT,
+        password TEXT
+    )
+'''
+
+cursor.execute(create_table_query)
+conn.commit()
+conn.close()
+
+os.system("export FLASK_APP=apache.py")
+
+class User(db.Model):
+    __tablename__ = 'user'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+
+    def __repr__(self):
+        return f"User('{self.email}')"
+
+def login_required(route_func):
+    @wraps(route_func)
+    def decorated_route(*args, **kwargs):
+        if 'email' not in session:
+            return redirect('/login')
+        return route_func(*args, **kwargs)
+    return decorated_route
 
 
 def detect_log_format(log_file_path):
@@ -61,7 +109,7 @@ def create_df(log_file_path):
 
     visitors_in_hour = logs_df.groupby('datetime').size()
 
-    max_points_to_display = 1000  # Adjust this as needed
+    max_points_to_display = 1000
 
     step_size = max(len(visitors_in_hour) // max_points_to_display, 1)
 
@@ -81,8 +129,8 @@ def requested_files(max_points_to_display, logs_df):
                  labels={'request': 'Request', 'count': 'Number of Requests', 'method': 'Method'})
     return fig.to_json()
 
-
 @app.route('/', methods=['GET', 'POST'])
+@login_required
 def dashboard():
     if request.method == 'POST':
         f = request.files['file']
@@ -108,16 +156,68 @@ def dashboard():
     return render_template('dashboard.html', error=error)
 
 
+@app.route('/logout', methods=['GET','POST'])
+def logout():
+    session.clear()
+    return redirect('/login')
+
+
 @app.route('/login', methods=['GET','POST'])
 def login():
+    email = None
+    password = None
+    if request.method == 'POST':
+        if request.form['email'] == None or request.form['email'] == '':
+            return render_template('login.html', error="Please enter your email address")
+        if request.form['password'] == None or request.form['password'] == '':
+            return render_template('login.html', error="Please enter your password")
+        
+        email = request.form['email']
+        password = request.form['password']
+        
+        user = User.query.filter_by(email=email).first()
+        if not user or not bcrypt.check_password_hash(user.password, password):
+            return render_template('login.html', error="Incorrect email or password",email=email or "")
+
+        session['email'] = user.email
+        return redirect('/')
     return render_template('login.html')
 
+
+@app.route('/register',methods=['GET','POST'])
+def register():
+    email = None
+    password = None
+    if request.method == 'POST':
+        if request.form['email'] == None or request.form['email'] == '' or request.form['password'] == None or request.form['password'] == '' or request.form['name'] == None or request.form['name'] == '' or request.form['confirm'] == None or request.form['confirm'] == '':
+            return render_template('login.html', error2="Please fill all the required fields", register=True)
+        if request.form['password'] != request.form['confirm']:
+            return render_template('login.html', error2="Password does not match", register=True)
+        email = request.form['email']
+        password = request.form['password']
+        name = request.form['name']
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            return render_template('login.html',error2="email already exists. Please choose a different email.", register=True)
+        new_user = User(name=name, email=email, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect('/login')
+    return render_template('login.html', register=True)
+
+
+@app.route('/settings', methods=['GET'])
+def settings():
+    return render_template('settings.html')
+
 @app.route('/uploads/<filename>')
+@login_required
 def serve_file(filename):
     return send_from_directory('./uploads', filename)
 
-
 @app.route('/reports/<report>', methods=['GET'])
+@login_required
 def reports(report):
     flag = 0
     for filename in os.listdir('./uploads'):
