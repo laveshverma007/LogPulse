@@ -327,8 +327,11 @@
                 </div>
             </div>
 
-            <div id="warning" class="-red-100 border-2 shadow-lg hidden border-red-400 text-red-700 dark:bg-red-800 dark:text-gray-300 bg-red-50 px-4 py-3 rounded-md relative my-4">
+            <div id="warning" class="border-2 shadow-lg hidden border-red-400 text-red-700 dark:bg-red-800 dark:text-gray-300 bg-red-50 px-4 py-3 rounded-md relative my-4">
                 <p class="font-black">Warning!!! We found some IP's or Hostname that are trying to Bruteforce the page, discovering Directories or DDOS your server.</p>
+            </div>
+            <div id="greenflag" class="border-2 shadow-lg hidden border-green-400 text-green-700 dark:bg-green-800 dark:text-gray-300 bg-green-50 px-4 py-3 rounded-md relative my-4">
+                <p class="font-black">We did'nt found any IP or Hostname that are trying to Bruteforce the page or DDOS your server. Its SAFE!</p>
             </div>
 
             <div
@@ -1053,15 +1056,19 @@
                     }
 
                     function renderClientIPDictionary(clientIPDict) {
-                        const div = document.getElementById('warning');
+                        const div1 = document.getElementById('warning');
+                        const div2 = document.getElementById('greenflag')
                         if(Object.keys(clientIPDict).length > 0) {
-                            div.classList.remove("hidden");
+                            div1.classList.remove("hidden");
                             for (const clientIP in clientIPDict) {
                                 const timestamps = clientIPDict[clientIP];
                                 const clientIPDiv = document.createElement('div');
                                 clientIPDiv.innerHTML = `<br><span class="font-extrabold">Client IP:</span> <span class="font-bold">${clientIP}</span><br><span class="font-extrabold">Timestamps:</span> <span class="font-bold">${timestamps.join(', ')}</span>`;
-                                div.appendChild(clientIPDiv);
+                                div1.appendChild(clientIPDiv);
                             }
+                        }
+                        else{
+                            div2.classList.remove("hidden");
                         }
                     }
 

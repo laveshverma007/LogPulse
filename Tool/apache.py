@@ -108,6 +108,10 @@ def dashboard():
     return render_template('dashboard.html', error=error)
 
 
+@app.route('/login', methods=['GET','POST'])
+def login():
+    return render_template('login.html')
+
 @app.route('/uploads/<filename>')
 def serve_file(filename):
     return send_from_directory('./uploads', filename)
