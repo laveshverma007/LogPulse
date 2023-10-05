@@ -89,7 +89,6 @@ def dashboard():
         if f and allowed_file(f.filename):
             content = f.read()
             f.seek(0)
-            print("content :", content)
             random_filename = generate_random_filename(content)
             extension = 'txt'
             new_filename = random_filename + '.' + extension

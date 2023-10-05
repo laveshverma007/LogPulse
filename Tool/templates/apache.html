@@ -327,6 +327,10 @@
                 </div>
             </div>
 
+            <div id="warning" class="-red-100 border-2 shadow-lg hidden border-red-400 text-red-700 dark:bg-red-800 dark:text-gray-300 bg-red-50 px-4 py-3 rounded-md relative my-4">
+                <p class="font-black">Warning!!! We found some IP's or Hostname that are trying to Bruteforce the page, discovering Directories or DDOS your server.</p>
+            </div>
+
             <div
                 id="data-table"
                 class="transition-all duration-700 bg-white rounded-lg shadow-md p-6 mt-8 overflow-x-auto dark:bg-gray-800"
@@ -829,13 +833,8 @@
 
             
             <script>
-                // Assuming you have a <div> with an id "chart" where you want to render the graph
                 var chartDiv = 'not_found_urls_graph';
-            
-                // Parse the JSON data
                 var logsData = {{data|safe}};
-            
-                // Create a layout for the chart using initialXRange3
                 var color = darkmode ? '#1a202c' : 'white';
                 var layout3 = {
                     paper_bgcolor: color,
@@ -886,8 +885,7 @@
                         logsData[0].request,
                         logsData[selectedDataPoints3 - 1].request
                     ];
-                    console.log(selectedDataPoints3)
-                    console.log(initialXRange3)
+
                     var pathCounts = {};
                     logsData.forEach(function (log) {
                         var path = log.request;
@@ -902,7 +900,6 @@
             
                     let paths = Object.keys(pathCounts);
                     let hitCounts = Object.values(pathCounts);
-                    console.log(paths.slice(0, selectedDataPoints3))
                     const updatedTrace3 = [{
                         x: paths.slice(0, selectedDataPoints3),
                         y: hitCounts.slice(0, selectedDataPoints3),
@@ -975,8 +972,6 @@
                         logsData[0].client,
                         logsData[selectedDataPoints4 - 1].client
                     ];
-                    console.log(selectedDataPoints4)
-                    console.log(initialXRange4)
                     var hostCounts = {};
                     logsData.forEach(function (log) {
                         var host = log.client;
@@ -989,8 +984,6 @@
 
                     let hosts = Object.keys(hostCounts);
                     let hitCounts = Object.values(hostCounts);
-                    console.log(hitCounts.slice(0, selectedDataPoints4))
-                    console.log(hosts.slice(0, selectedDataPoints4))
                     const updatedTrace4 = [{
                         x: hosts.slice(0, selectedDataPoints4),
                         y: hitCounts.slice(0, selectedDataPoints4),
@@ -1009,6 +1002,74 @@
                 document.getElementById('dataRange4').addEventListener('input', updateChart4);
             
                 updateChart4();
+            </script>
+
+
+            <script>
+                const clientIPDict = {}
+                function parseDatetime(datetimeStr) {
+                    const parts = datetimeStr.match(/(\d{2})\/(\w{3})\/(\d{4}):(\d{2}):(\d{2}):(\d{2})/);
+                    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    const month = monthNames.indexOf(parts[2]);
+                    const day = parseInt(parts[1], 10);
+                    const year = parseInt(parts[3], 10);
+                    const hour = parseInt(parts[4], 10);
+                    const minute = parseInt(parts[5], 10);
+                    const second = parseInt(parts[6], 10);
+                    return new Date(year, month, day, hour, minute, second);
+                  }
+                  
+                  function findClientsWithExcessiveRequests(logData) {
+                    const clientRequestCounts = {};
+                    const threshold = 100;
+                    const windowSize = 10 * 1000;
+                  
+                    logData.sort((a, b) => parseDatetime(a.datetime) - parseDatetime(b.datetime));
+
+                    for (const entry of logData) {
+                      const clientIP = entry.client;
+                      const entryTime = parseDatetime(entry.datetime);
+
+                      for (const ip in clientRequestCounts) {
+                        if (clientRequestCounts[ip].timestamp < entryTime - windowSize) {
+                          delete clientRequestCounts[ip];
+                        }
+                      }
+
+                      if (!clientRequestCounts[clientIP]) {
+                        clientRequestCounts[clientIP] = { count: 0, timestamp: entryTime };
+                      }
+                      clientRequestCounts[clientIP].count++;
+                  
+                      if (clientRequestCounts[clientIP].count > threshold) {
+                        //console.log(`${clientIP} exceeded the threshold at ${entry.datetime}`);
+                        if (!clientIPDict[clientIP]) {
+                            clientIPDict[clientIP] = [];
+                        }
+                        if (!clientIPDict[clientIP].includes(entry.datetime)) {
+                            clientIPDict[clientIP].push(entry.datetime);
+                        }
+                      }
+                    }
+
+                    function renderClientIPDictionary(clientIPDict) {
+                        const div = document.getElementById('warning');
+                        if(Object.keys(clientIPDict).length > 0) {
+                            div.classList.remove("hidden");
+                            for (const clientIP in clientIPDict) {
+                                const timestamps = clientIPDict[clientIP];
+                                const clientIPDiv = document.createElement('div');
+                                clientIPDiv.innerHTML = `<br><span class="font-extrabold">Client IP:</span> <span class="font-bold">${clientIP}</span><br><span class="font-extrabold">Timestamps:</span> <span class="font-bold">${timestamps.join(', ')}</span>`;
+                                div.appendChild(clientIPDiv);
+                            }
+                        }
+                    }
+
+                    renderClientIPDictionary(clientIPDict);
+                  }
+
+                  findClientsWithExcessiveRequests(logsData);
+
             </script>
             
 
