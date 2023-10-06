@@ -5,13 +5,6 @@ function AnimatedCursor(){
 
     const innerCursor = document.querySelector(".dot1");
 
-    // let darkmode = localStorage.getItem("darkMode");
-    innerCursor.style.backgroundColor = "black";
-    if (darkmode){
-        console.log("changed")
-        innerCursor.style.backgroundColor = "white";
-    }
-
     const initCursor = () => {
     // add listener to track the current mouse position
     document.addEventListener("mousemove", (e) => {
@@ -43,13 +36,10 @@ function AnimatedCursor(){
         height: 75,
     };
     paper.setup(canvas);
-    let strokeColor = "black"
-    if(darkmode){
-        strokeColor = "white"
-    }
-    const strokeWidth = 1;
+    const strokeColor = "rgb(50,153,250)"
+    const strokeWidth = 2;
     const segments = 8;
-    const radius = 20;
+    const radius = 13;
 
     // we'll need these later for the noisy circle
     const noiseScale = 150; // speed
@@ -86,9 +76,6 @@ function AnimatedCursor(){
     // the draw loop of Paper.js
     // (60fps with requestAnimationFrame under the hood)
     paper.view.onFrame = (event) => {
-        // using linear interpolation, the circle will move 0.2 (20%)
-        // of the distance between its current position and the mouse
-        // coordinates per Frame
         lastX = lerp(lastX, clientX, 0.2);
         lastY = lerp(lastY, clientY, 0.2);
         group.position = new paper.Point(lastX, lastY);

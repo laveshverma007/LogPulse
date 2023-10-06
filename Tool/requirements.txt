@@ -14,3 +14,6 @@ flask
 loguru
 plotly
 flask_session
+flask_sqlalchemy
+flask_migrate
+flask_bcrypt

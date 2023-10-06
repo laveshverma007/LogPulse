@@ -58,13 +58,13 @@
         }
         
         .dot1 {
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
             left: -2.5px;
             top: -2.5px;
             border-radius: 50%;
             z-index: 11000;
-            background: black;
+            background: rgb(50,153,250);
         }
 
     </style>
@@ -156,7 +156,7 @@
                 <a
                   href="/logout"
                   class="text-black-700 dark:text-gray-200 font-bold text-lg px-2"
-                  onclick="document.getElementById('drawer-settings').click()"
+                  onclick="document.getElementById('drawer-settings').click(); localStorage.removeItem('welcome_msg')"
                   >Logout</a
                 >
                 <svg
@@ -1200,7 +1200,6 @@
                     localStorage.setItem("darkMode", "false");
                     body.classList.remove("dark");
                     html.classList.remove("dark");
-                    AnimatedCursor();
                     updateChart1();
                     updateChart2();
                     updateChart3();
@@ -1210,7 +1209,6 @@
                     localStorage.setItem("darkMode", "true");
                     body.classList.add("dark");
                     html.classList.add("dark");
-                    AnimatedCursor();
                     updateChart1();
                     updateChart2();
                     updateChart3();

@@ -54,13 +54,13 @@
         }
         
         .dot1 {
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
             left: -2.5px;
             top: -2.5px;
             border-radius: 50%;
             z-index: 11000;
-            background: black;
+            background: rgb(50,153,250);
         }
         
       #welcome-section {
@@ -182,7 +182,7 @@
           <a
             href="/logout"
             class="text-black-700 dark:text-gray-200 font-bold text-lg px-2"
-            onclick="document.getElementById('drawer-settings').click()"
+            onclick="document.getElementById('drawer-settings').click(); localStorage.removeItem('welcome_msg')"
             >Logout</a
           >
           <svg
@@ -229,7 +229,7 @@
       >
         <div class="text-center">
           {% if error %}
-          <div class="alert alert-danger">{{ error }}</div>
+          <div class="alert alert-danger dark:text-white">{{ error }}</div>
           {% endif %}
           <h2 class="mt-5 text-3xl font-bold text-gray-900 dark:text-white">
             File Upload!
@@ -309,8 +309,9 @@
       </div>
     </div>
     <script>
+      function welcome(){
         let darkmode = localStorage.getItem("darkMode");
-      document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
           const welcomeSection = document.getElementById('welcome-section');
           const contentSection = document.getElementById('content-section');
 
@@ -337,37 +338,42 @@
               },
           });
         });
+      }
+
+      if(!localStorage.getItem("welcome_msg")){
+        console.log("milgaya")
+        localStorage.setItem("welcome_msg","True")
+        console.log(localStorage.getItem("welcome_msg"))
+        welcome();
+      }
+      else{
+        document.getElementById("content-section").style.opacity = '1';
+        document.getElementById("content-section").style.transform = 'scale(1)';
+        document.getElementById("content-section").classList.add('absolute');
+      }
     </script>
-    <script src="/uploads/cursor.js"></script>
     <script>
-        if(darkmode === "false"){
-            toggleDarkMode();
-            toggleDarkMode();
+      const darkModePreference = localStorage.getItem("darkMode");
+      if (darkModePreference && darkModePreference == "true") {
+        document.getElementById("dark-check").click();
+      }
+      function toggleDarkMode() {
+        const body = document.body;
+        const html = document.documentElement;
+        if (body.classList.contains("dark")) {
+          darkmode = false;
+          localStorage.setItem("darkMode", "false");
+          body.classList.remove("dark");
+          html.classList.remove("dark");
+        } else {
+          darkmode = true;
+          localStorage.setItem("darkMode", "true");
+          body.classList.add("dark");
+          html.classList.add("dark");
         }
-        const darkModePreference = localStorage.getItem("darkMode");
-        if (darkModePreference && darkModePreference == "true") {
-          document.getElementById("dark-check").click();
-        }
-        function toggleDarkMode() {
-          const body = document.body;
-          const html = document.documentElement;
-          if (body.classList.contains("dark")) {
-            darkmode = false;
-            localStorage.setItem("darkMode", "false");
-            body.classList.remove("dark");
-            html.classList.remove("dark");
-            AnimatedCursor();
-            // updateChart1();
-            // updateChart2();
-          } else {
-            darkmode = true;
-            localStorage.setItem("darkMode", "true");
-            body.classList.add("dark");
-            html.classList.add("dark");
-            AnimatedCursor();
-          }
-        }
+      }
       </script>
+      <script src="/uploads/cursor.js"></script>
 
     <!-- <script>
         let clientX = 100;
