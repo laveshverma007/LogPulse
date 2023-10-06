@@ -5,8 +5,10 @@ from flask_session import Session
 import os
 import plotly.express as px
 import hashlib
+from datetime import datetime
 from loguru import logger
 import re
+import subprocess
 import plotly.graph_objs as go
 from flask import Flask, render_template, redirect, url_for, request
 import sqlite3
@@ -156,6 +158,20 @@ def dashboard():
     return render_template('dashboard.html', error=error)
 
 
+@app.route('/getInfo', methods=['GET'])
+@login_required
+def get_ip():
+    client = request.args.get('client')
+    # whitelist = ["QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm."]
+    if client:
+        curl_command = [
+            'curl',
+            f'https://demo.ip-api.com/json/{client}?fields=66842623&lang=en',
+            '-H', 'Origin: https://ip-api.com'
+        ]
+        result = subprocess.run(curl_command, stdout=subprocess.PIPE, text=True)
+        return result.stdout
+
 @app.route('/logout', methods=['GET','POST'])
 def logout():
     session.clear()
@@ -208,6 +224,7 @@ def register():
 
 
 @app.route('/settings', methods=['GET'])
+@login_required
 def settings():
     return render_template('settings.html')
 
