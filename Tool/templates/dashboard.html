@@ -1,58 +1,46 @@
 <!DOCTYPE html>
 <html class="transition-all duration-700">
-  <head>
+
+<head>
     <title>DataFrame Table</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css"
-    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
     <!-- Tabulator CSS -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.3.0/css/tabulator.min.css"
-      rel="stylesheet"
-    />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.3.0/css/tabulator.min.css" rel="stylesheet" />
     <!-- Tabulator JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.3.0/js/tabulator.min.js"></script>
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <script src="https://cdn.datatables.net/autofill/2.3.10/js/dataTables.autoFill.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" />
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.0/paper-core.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
     <style>
-
         html {
-            cursor: none; /* Hide the default cursor */
+            cursor: none;
+            /* Hide the default cursor */
         }
-        
+
         .cursor-follower {
             position: fixed;
             left: 0;
             top: 0;
             pointer-events: none;
         }
-        
+
         .circle1 {
             width: 100vw;
             height: 100vh;
             z-index: 12000;
         }
-        
+
         .dot1 {
             width: 6px;
             height: 6px;
@@ -60,320 +48,252 @@
             top: -2.5px;
             border-radius: 50%;
             z-index: 11000;
-            background: rgb(50,153,250);
+            background: rgb(50, 153, 250);
         }
-        
-      #welcome-section {
-        position: relative;
-        background-image: url("/uploads/logpulse.svg");
-        width: 100%;
-        height: 100vh;
-        background-size: 80%;
-        background-repeat: no-repeat;
-        background-position: center; /* Center the background image horizontally and vertically */
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        margin-left: 300px;
-        color: #fff; /* Text color for welcome message */
-      }
 
-      #content-section {
-        /* Add initial styles for scale and opacity */
-        transform: scale(0);
-        opacity: 0;
-        transition: transform 0.6s ease-in-out, opacity 0.5s ease-in-out; /* Transitions for scale and opacity */
-      }
+        #welcome-section {
+            position: relative;
+            background-image: url("/uploads/logpulse.svg");
+            width: 100%;
+            height: 100vh;
+            background-size: 175%;
+            background-repeat: no-repeat;
+            background-position: center;
+            /* Center the background image horizontally and vertically */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-left: 710px;
+            color: #fff;
+            /* Text color for welcome message */
+        }
+
+        #content-section {
+            /* Add initial styles for scale and opacity */
+            transform: scale(0);
+            opacity: 0;
+            transition: transform 0.6s ease-in-out, opacity 0.5s ease-in-out;
+            /* Transitions for scale and opacity */
+        }
     </style>
-  </head>
-  <script>
+</head>
+<script>
     tailwind.config = {
-      darkMode: "class",
+        darkMode: "class",
     };
-  </script>
+</script>
 
-  <body
-    class="dark:bg-gray-700 bg-gray-100 transition-all duration-700  overflow-hidden flex justify-center items-center h-screen"
-  >
-  <div class="cursor-follower dot1"></div>
-      <canvas class="cursor-follower circle1" resize></canvas>
-</div>
-    <div id="welcome-section" class="text-4xl font-semibold opacity-0"></div>
-    <div class="flex pt-4 pl-6 z-50">
-      <input
-        type="checkbox"
-        id="drawer-toggle"
-        class="relative sr-only peer"
-      />
-      <label
-        id="drawer-settings"
-        for="drawer-toggle"
-        onclick="document.getElementById('drawer-settings').classList.toggle('fixed'); document.getElementById('drawer-settings').classList.toggle('absolute');document.getElementById('drawer-settings').classList.toggle('ml-2');document.getElementById('content-section').classList.toggle('opacity-40');"
-        class="text-white hover:shadow-lg bg-blue-600 hover:bg-blue-800 hover:scale-110 ease-in-out focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-[100%] text-md m-2 ml-5 p-3.5 text-center inline-flex dark:bg-blue-500 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer absolute z-10 top-4 -mb-10 left-6 transition-all transform duration-500 peer-checked:left-64 peer-checked:-rotate-180 dark:text-gray-700"
-      >
-        <svg
-          class="w-5 h-5"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 14 10"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M1 5h12m0 0L9 1m4 4L9 9"
-          />
-        </svg>
-      </label>
-      <div
-        class="fixed top-0 left-0 z-20 w-64 h-full transition-all duration-500 transform -translate-x-full bg-white shadow-xl peer-checked:translate-x-0 dark:bg-gray-800"
-      >
-        <div class="pl-12 pt-8 scale-110">
-          <label
-            class="relative inline-flex items-center mb-5 cursor-pointer"
-          >
-            <input
-              id="dark-check"
-              type="checkbox"
-              value=""
-              class="sr-only peer"
-              onchange="toggleDarkMode()"
-            />
-            <div
-              class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-            ></div>
-            <span
-              class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300"
-              >Dark Mode</span
-            >
-          </label>
-        </div>
-        <div class="mt-4">
-          <div
-            class="text-md p-2 ml-8 flex font-medium text-gray-900 dark:text-gray-300"
-          >
-            <a
-              href="/settings"
-              class="text-black-700 dark:text-gray-200 font-bold text-lg px-2"
-              onclick="document.getElementById('drawer-settings').click()"
-              >Settings</a
-            >
-            <svg
-              class="dark:fill-white"
-              xmlns="http://www.w3.org/2000/svg"
-              height="1.5em"
-              viewBox="0 0 512 512"
-            >
-              <path
-                d="M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 
-              8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 
-              9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z"
-              />
-            </svg>
-          </div>
-        </div>
-        <div
-          class="h-full pb-44 items-end text-md p-2 ml-8 flex font-medium text-gray-900 dark:text-gray-300"
-        >
-          <a
-            href="/logout"
-            class="text-black-700 dark:text-gray-200 font-bold text-lg px-2"
-            onclick="document.getElementById('drawer-settings').click(); localStorage.removeItem('welcome_msg')"
-            >Logout</a
-          >
-          <svg
-            class="dark:fill-white"
-            height="2rem"
-            viewBox="0 0 24 24"
-            fill="black"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g
-              id="SVGRepo_tracerCarrier"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            ></g>
-            <g id="SVGRepo_iconCarrier">
-              <path
-              class="dark:fill-white"
-                opacity="0.6"
-                d="M15 2H14C11.1716 2 9.75736 2 8.87868 2.87868C8 3.75736 8 5.17157 8 8V16C8 18.8284 8 20.2426 8.87868 21.1213C9.75736 22 11.1716 22 14 22H15C17.8284 22 19.2426 22 20.1213 21.1213C21 20.2426 21 18.8284 21 16V8C21 5.17157 21 3.75736 20.1213 2.87868C19.2426 2 17.8284 2 15 2Z"
-                fill="black"
-              ></path>
-              <path
-              class="dark:fill-white"
-                opacity="0.4"
-                d="M8 8C8 6.46249 8 5.34287 8.14114 4.5H8C5.64298 4.5 4.46447 4.5 3.73223 5.23223C3 5.96447 3 7.14298 3 9.5V14.5C3 16.857 3 18.0355 3.73223 18.7678C4.46447 19.5 5.64298 19.5 8 19.5H8.14114C8 18.6571 8 17.5375 8 16V12.75V11.25V8Z"
-                fill="back"
-              ></path>
-              <path
-              class="dark:fill-white"
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M4.46967 11.4697C4.17678 11.7626 4.17678 12.2374 4.46967 12.5303L6.46967 14.5303C6.76256 14.8232 7.23744 14.8232 7.53033 14.5303C7.82322 14.2374 7.82322 13.7626 7.53033 13.4697L6.81066 12.75L14 12.75C14.4142 12.75 14.75 12.4142 14.75 12C14.75 11.5858 14.4142 11.25 14 11.25L6.81066 11.25L7.53033 10.5303C7.82322 10.2374 7.82322 9.76256 7.53033 9.46967C7.23744 9.17678 6.76256 9.17678 6.46967 9.46967L4.46967 11.4697Z"
-                fill="black"
-              ></path>
-            </g>
-          </svg>
-        </div>
-      </div>
+<body
+    class="dark:bg-gray-700 bg-gray-200 transition-all duration-700  overflow-hidden flex justify-center items-center h-screen">
+    <div class="cursor-follower dot1"></div>
+    <canvas class="cursor-follower circle1" resize></canvas>
     </div>
-    <div id="content-section" class="transition-all duration-700 justify-center items-center ease-in-out">
-      <div
-        class="sm:max-w-lg w-full p-10 dark:bg-gray-800 transition-all duration-700 bg-white rounded-xl z-10 items-center mx-auto"
-      >
-        <div class="text-center">
-          {% if error %}
-          <div class="alert alert-danger dark:text-white">{{ error }}</div>
-          {% endif %}
-          <h2 class="mt-5 text-3xl font-bold text-gray-900 dark:text-white">
-            File Upload!
-          </h2>
-          <p
-            class="mt-2 text-sm text-gray-800 dark:text-gray-400 font-semibold"
-          >
-            Upload your Apache log file (size should be less than 10 MB)
-          </p>
-        </div>
-        <form
-          class="mt-8 space-y-3"
-          action="http://localhost:3000/"
-          method="POST"
-          enctype="multipart/form-data"
-        >
-          <div class="flex items-center justify-center w-full">
-            <label
-              for="dropzone-file"
-              class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-            >
-              <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                <svg
-                  class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400 transition-all duration-700"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 20 16"
-                >
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                  />
+    <div id="welcome-section" class="text-4xl font-semibold opacity-0 mx-auto"></div>
+    <div class="flex pt-4 pl-6 z-50">
+        <input type="checkbox" id="drawer-toggle" class="relative sr-only peer" />
+        <label id="drawer-settings" for="drawer-toggle"
+            onclick="document.getElementById('drawer-settings').classList.toggle('fixed'); document.getElementById('drawer-settings').classList.toggle('absolute');document.getElementById('drawer-settings').classList.toggle('ml-2');document.getElementById('content-section').classList.toggle('opacity-40');"
+            class="text-white hover:shadow-lg bg-blue-600 hover:bg-blue-800 hover:scale-110 ease-in-out focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-[100%] text-md m-2 ml-5 p-3.5 text-center inline-flex dark:bg-blue-500 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer absolute z-10 top-4 -mb-10 left-6 transition-all transform duration-500 peer-checked:left-64 peer-checked:-rotate-180 dark:text-gray-700">
+            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M1 5h12m0 0L9 1m4 4L9 9" />
+            </svg>
+        </label>
+        <div
+            class="fixed top-0 left-0 z-20 w-64 h-full transition-all duration-500 transform -translate-x-full bg-white shadow-xl peer-checked:translate-x-0 dark:bg-gray-800">
+            <div class="pl-12 pt-8 scale-110">
+                <label class="relative inline-flex items-center mb-5 cursor-pointer">
+                    <input id="dark-check" type="checkbox" value="" class="sr-only peer" onchange="toggleDarkMode()" />
+                    <div
+                        class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                    </div>
+                    <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Dark Mode</span>
+                </label>
+            </div>
+            <div class="mt-4">
+                <div class="text-md p-2 ml-8 flex font-medium text-gray-900 dark:text-gray-300">
+                    <a href="/settings" class="text-black-700 dark:text-gray-200 font-bold text-lg px-2"
+                        onclick="document.getElementById('drawer-settings').click()">Settings</a>
+                    <svg class="dark:fill-white" xmlns="http://www.w3.org/2000/svg" height="1.5em"
+                        viewBox="0 0 512 512">
+                        <path
+                            d="M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 
+            8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 
+            9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="h-full pb-44 items-end text-md p-2 ml-8 flex font-medium text-gray-900 dark:text-gray-300">
+                <a href="/logout" class="text-black-700 dark:text-gray-200 font-bold text-lg px-2"
+                    onclick="document.getElementById('drawer-settings').click(); localStorage.removeItem('welcome_msg')">Logout</a>
+                <svg class="dark:fill-white" height="2rem" viewBox="0 0 24 24" fill="black"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                    <g id="SVGRepo_iconCarrier">
+                        <path class="dark:fill-white" opacity="0.6"
+                            d="M15 2H14C11.1716 2 9.75736 2 8.87868 2.87868C8 3.75736 8 5.17157 8 8V16C8 18.8284 8 20.2426 8.87868 21.1213C9.75736 22 11.1716 22 14 22H15C17.8284 22 19.2426 22 20.1213 21.1213C21 20.2426 21 18.8284 21 16V8C21 5.17157 21 3.75736 20.1213 2.87868C19.2426 2 17.8284 2 15 2Z"
+                            fill="black"></path>
+                        <path class="dark:fill-white" opacity="0.4"
+                            d="M8 8C8 6.46249 8 5.34287 8.14114 4.5H8C5.64298 4.5 4.46447 4.5 3.73223 5.23223C3 5.96447 3 7.14298 3 9.5V14.5C3 16.857 3 18.0355 3.73223 18.7678C4.46447 19.5 5.64298 19.5 8 19.5H8.14114C8 18.6571 8 17.5375 8 16V12.75V11.25V8Z"
+                            fill="back"></path>
+                        <path class="dark:fill-white" fill-rule="evenodd" clip-rule="evenodd"
+                            d="M4.46967 11.4697C4.17678 11.7626 4.17678 12.2374 4.46967 12.5303L6.46967 14.5303C6.76256 14.8232 7.23744 14.8232 7.53033 14.5303C7.82322 14.2374 7.82322 13.7626 7.53033 13.4697L6.81066 12.75L14 12.75C14.4142 12.75 14.75 12.4142 14.75 12C14.75 11.5858 14.4142 11.25 14 11.25L6.81066 11.25L7.53033 10.5303C7.82322 10.2374 7.82322 9.76256 7.53033 9.46967C7.23744 9.17678 6.76256 9.17678 6.46967 9.46967L4.46967 11.4697Z"
+                            fill="black"></path>
+                    </g>
                 </svg>
-                <p
-                  class="mb-2 text-sm text-gray-500 dark:text-gray-400 transition-all duration-700"
-                >
-                  <span class="font-semibold">Click to upload</span> or drag and
-                  drop
+            </div>
+        </div>
+    </div>
+    <div id="content-section" class="transition-all duration-700 w-full justify-center items-center ease-in-out">
+        <div
+            class="sm:max-w-lg w-full p-10 dark:bg-gray-800 mb-12 transition-all duration-700 bg-white rounded-xl z-10 items-center mx-auto">
+            <div class="text-center">
+                {% if error %}
+                <div class="alert alert-danger dark:text-red-500 font-semibold text-lg">{{ error }}</div>
+                {% endif %}
+                <h2 class="mt-5 text-3xl font-bold text-gray-900 dark:text-white">
+                    File Upload!
+                </h2>
+                <p class="mt-2 text-sm text-gray-800 dark:text-gray-400 font-semibold">
+                    Upload your Apache log file (size should be less than 10 MB)
                 </p>
-                <p
-                  id="display"
-                  class="text-xs text-gray-500 dark:text-gray-400 transition-all duration-700"
-                >
-                  LOG or TXT (MAX. 10MB)
-                </p>
-              </div>
-              <input
-                id="dropzone-file"
-                type="file"
-                name="file"
-                class="hidden"
-                onchange="display()"
-              />
-            </label>
-          </div>
-          <script>
-            function display() {
-              document.getElementById("display").innerHTML =
-                "<div class='pt-6 space-x-1'><svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-8 h-8 inline-flex'><path stroke-linecap='round' stroke-linejoin='round' d='M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z' /></svg><strong class='text-xl inline'>" +
-                document.getElementById("dropzone-file").value.split("\\")[2] +
-                "</strong></div>";
-            }
-          </script>
-          <div>
-            <button
-              type="submit"
-              class="my-5 w-full flex justify-center bg-blue-500 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none focus:shadow-outline hover:bg-blue-600 shadow-lg cursor-pointer transition ease-in duration-300"
-            >
-              Upload
-            </button>
-          </div>
-        </form>
-      </div>
+            </div>
+            <form class="mt-8 space-y-3" action="http://localhost:3000/" method="POST" enctype="multipart/form-data">
+                <div class="flex items-center justify-center w-full">
+                    <label for="dropzone-file"
+                        class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400 transition-all duration-700"
+                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                            </svg>
+                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400 transition-all duration-700">
+                                <span class="font-semibold">Click to upload</span> or drag and
+                                drop
+                            </p>
+                            <p id="display"
+                                class="text-xs text-gray-500 dark:text-gray-400 transition-all duration-700">
+                                LOG or TXT (MAX. 10MB)
+                            </p>
+                        </div>
+                        <input id="dropzone-file" type="file" name="file" class="hidden" onchange="display()" />
+                    </label>
+                </div>
+                <script>
+                    function display() {
+                        document.getElementById("display").innerHTML =
+                            "<div class='pt-6 space-x-1'><svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-8 h-8 inline-flex'><path stroke-linecap='round' stroke-linejoin='round' d='M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z' /></svg><strong class='text-xl inline'>" +
+                            document.getElementById("dropzone-file").value.split("\\")[2] +
+                            "</strong></div>";
+                    }
+                </script>
+                <div>
+                    <button type="submit"
+                        class="my-5 w-full flex justify-center bg-gray-700 text-gray-100 p-4 rounded-lg tracking-wide font-semibold focus:outline-none focus:shadow-outline hover:bg-black shadow-lg cursor-pointer transition ease-in duration-300">
+                        Upload
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="mx-auto items-center justify-center text-center text-xl text-gray-700 dark:text-gray-200">
+            <p class="text-2xl font-bold">Or</p><br> Try this SSH feature! just provide your server's SSH credentials,
+            path to your apache log file, and experience the live analsis!
+            <form class="w-full" action="/ssh" method="POST">
+                <div class="dark:bg-gray-800 bg-white text-gray-200 w-fit text-center rounded-md px-3 py-2 mx-auto mt-8">
+                    <div class="w-fit text-center py-3 dark:text-white text-gray-800"># scp <input name="user" placeholder="Username"
+                            oninput="this.style.width = (this.value.length + 1) + 'ch';"
+                            class="w-[15%] text-center inline transition-all duration-300 ease-in-out dark:bg-gray-700 bg-gray-200 outline-none focus:outline-none p-1 text-md rounded-md"
+                            type="text">@<input name="hostname" placeholder="Hostname"
+                            oninput="this.style.width = (this.value.length + 1) + 'ch';"
+                            class="w-[15%] text-center inline transition-all duration-300 dark:bg-gray-700 bg-gray-200 outline-none focus:outline-none p-1 text-md rounded-md"
+                            type="text">:<input name="path" placeholder="Path to Log file" oninput="this.style.width = (this.value.length + 1) + 'ch';"
+                            class="w-[25%] text-center inline transition-all duration-300 dark:bg-gray-700 bg-gray-200 outline-none focus:outline-none p-1 text-md rounded-md"
+                            type="text"> /var/www/LogPulse/uploads/
+                            <div class="my-4"><input name="password" placeholder="Password" oninput="this.style.width = (this.value.length + 1) + 'ch';"
+                                class="w-3/12 text-center inline transition-all duration-300 dark:bg-gray-700 bg-gray-200 outline-none focus:outline-none p-1 text-md rounded-md"
+                                type="password">
+                            </div>
+                            <div class="my-4"><input name="port" placeholder="PortNumber (default 22)" oninput="this.style.width = (this.value.length + 1) + 'ch';"
+                                class="w-3/12 text-center inline transition-all duration-300 dark:bg-gray-700 bg-gray-200 outline-none focus:outline-none p-1 text-md rounded-md"
+                                type="text">
+                            </div>
+                    </div>
+                </div>
+                <button class="my-6 w-fit p-2 bg-gray-800 rounded-lg text-gray-100 font-semibold hover:bg-black shadow-lg ouline-none focus:outline-none">Connect</button>
+            </form>
+        </div>
     </div>
     <script>
-      function welcome(){
-        let darkmode = localStorage.getItem("darkMode");
-        document.addEventListener('DOMContentLoaded', () => {
-          const welcomeSection = document.getElementById('welcome-section');
-          const contentSection = document.getElementById('content-section');
+        function welcome() {
+            let darkmode = localStorage.getItem("darkMode");
+            document.addEventListener('DOMContentLoaded', () => {
+                const welcomeSection = document.getElementById('welcome-section');
+                const contentSection = document.getElementById('content-section');
 
-          anime({
-              targets: '#welcome-section',
-              opacity: 1,
-              rotate: 360,
-              duration: 2000, // 2 seconds for fade-in
-              easing: 'easeInOutQuart',
-              complete: () => {
-                  anime({
-                      targets: '#welcome-section',
-                      opacity: 0,
-                      duration: 1000,
-                      easing: 'easeInOutQuart',
-                      scale: 10,
-                      delay: 500,
-                      complete: () => {
-                          contentSection.style.transform = 'scale(1)';
-                          contentSection.style.opacity = '1';
-                          contentSection.classList.add('absolute');
-                      },
-                  });
-              },
-          });
-        });
-      }
+                anime({
+                    targets: '#welcome-section',
+                    opacity: 1,
+                    rotate: 360,
+                    duration: 2000, // 2 seconds for fade-in
+                    easing: 'easeInOutQuart',
+                    complete: () => {
+                        anime({
+                            targets: '#welcome-section',
+                            opacity: 0,
+                            duration: 1000,
+                            easing: 'easeInOutQuart',
+                            scale: 10,
+                            delay: 500,
+                            complete: () => {
+                                contentSection.style.transform = 'scale(1)';
+                                contentSection.style.opacity = '1';
+                                contentSection.classList.add('absolute');
+                            },
+                        });
+                    },
+                });
+            });
+        }
 
-      if(!localStorage.getItem("welcome_msg")){
-        console.log("milgaya")
-        localStorage.setItem("welcome_msg","True")
-        console.log(localStorage.getItem("welcome_msg"))
-        welcome();
-      }
-      else{
-        document.getElementById("content-section").style.opacity = '1';
-        document.getElementById("content-section").style.transform = 'scale(1)';
-        document.getElementById("content-section").classList.add('absolute');
-      }
+        if (!localStorage.getItem("welcome_msg")) {
+            console.log("milgaya")
+            localStorage.setItem("welcome_msg", "True")
+            console.log(localStorage.getItem("welcome_msg"))
+            welcome();
+        }
+        else {
+            document.getElementById("content-section").style.opacity = '1';
+            document.getElementById("content-section").style.transform = 'scale(1)';
+            document.getElementById("content-section").classList.add('absolute');
+        }
     </script>
     <script>
-      const darkModePreference = localStorage.getItem("darkMode");
-      if (darkModePreference && darkModePreference == "true") {
-        document.getElementById("dark-check").click();
-      }
-      function toggleDarkMode() {
-        const body = document.body;
-        const html = document.documentElement;
-        if (body.classList.contains("dark")) {
-          darkmode = false;
-          localStorage.setItem("darkMode", "false");
-          body.classList.remove("dark");
-          html.classList.remove("dark");
-        } else {
-          darkmode = true;
-          localStorage.setItem("darkMode", "true");
-          body.classList.add("dark");
-          html.classList.add("dark");
+        const darkModePreference = localStorage.getItem("darkMode");
+        if (darkModePreference && darkModePreference == "true") {
+            document.getElementById("dark-check").click();
         }
-      }
-      </script>
-      <script src="/uploads/cursor.js"></script>
+        function toggleDarkMode() {
+            const body = document.body;
+            const html = document.documentElement;
+            if (body.classList.contains("dark")) {
+                darkmode = false;
+                localStorage.setItem("darkMode", "false");
+                body.classList.remove("dark");
+                html.classList.remove("dark");
+            } else {
+                darkmode = true;
+                localStorage.setItem("darkMode", "true");
+                body.classList.add("dark");
+                html.classList.add("dark");
+            }
+        }
+    </script>
+    <script src="/uploads/cursor.js"></script>
 
     <!-- <script>
         let clientX = 100;
@@ -461,5 +381,6 @@
         }
         initCanvas();
     </script>-->
-  </body>
+</body>
+
 </html>

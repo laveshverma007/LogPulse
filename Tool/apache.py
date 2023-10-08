@@ -9,7 +9,9 @@ from datetime import datetime
 from loguru import logger
 import re
 import subprocess
+import string
 import plotly.graph_objs as go
+import paramiko
 from flask import Flask, render_template, redirect, url_for, request
 import sqlite3
 from flask_sqlalchemy import SQLAlchemy
@@ -75,6 +77,7 @@ def login_required(route_func):
 def detect_log_format(log_file_path):
     common_log_pattern = r'^\S+ \S+ \S+ \[[^\]]+\] ".+" \d+ \d+'
     combined_log_pattern = r'^\S+ \S+ \S+ \[[^\]]+\] ".+" \d+ \d+ ".+" ".+"$'
+    nginx_log_pattern = r'(\S+) (\S+) (\S+) \[([^\]]+)\] "([^"]+)" (\d+) (\d+) "([^"]+)" "([^"]+)"'
 
     with open(log_file_path, 'r') as log_file:
         for line in log_file:
@@ -82,7 +85,7 @@ def detect_log_format(log_file_path):
                 return 'combined'
             elif re.match(common_log_pattern, line):
                 return 'common'
-    return 'unknown'
+    return "unknown"
 
 
 def allowed_file(filename):
@@ -95,27 +98,56 @@ def allowed_file(filename):
 
 def create_df(log_file_path):
     log_format = detect_log_format(log_file_path)
-    logger.info(f'Detected log format: {log_format}')
-    os.system('rm -rf access_logs.parquet log_errors.csv')
-    adv.logs_to_df(log_file=log_file_path,
-                   output_file='access_logs.parquet',
-                   errors_file='log_errors.csv',
-                   log_format=log_format,
-                   fields=None)
+    if log_format == "nginx":
+        delimiter = r'\s+'
+        columns = [
+            'client', 'userid', 'datetime', 'request', 'status',
+            'size', 'referer', 'user_agent'
+        ]
+        logs_df = pd.read_csv(
+            log_file_path,
+            sep=delimiter,
+            header=None,
+            names=columns,
+            na_values='-',
+            parse_dates=['datetime'],
+            usecols=[0, 1, 2, 3, 4, 5, 6, 7],
+            engine='python'
+        )
+        logs_df['datetime'] = pd.to_datetime(logs_df['datetime'],
+                                            format='%d/%b/%Y:%H:%M:%S %z')
 
-    logs_df = pd.read_parquet('access_logs.parquet')
-    logs_df['datetime'] = pd.to_datetime(logs_df['datetime'],
-                                         format='%d/%b/%Y:%H:%M:%S %z')
+        logs_df['datetime'] = logs_df['datetime'].dt.strftime('%d/%b/%Y:%H:%M:%S')
 
-    logs_df['datetime'] = logs_df['datetime'].dt.strftime('%d/%b/%Y:%H:%M:%S')
+        visitors_in_hour = logs_df.groupby('datetime').size()
 
-    visitors_in_hour = logs_df.groupby('datetime').size()
+        max_points_to_display = 1000
 
-    max_points_to_display = 1000
+        step_size = max(len(visitors_in_hour) // max_points_to_display, 1)
 
-    step_size = max(len(visitors_in_hour) // max_points_to_display, 1)
+        return logs_df, visitors_in_hour, step_size
+    else:
+        logger.info(f'Detected log format: {log_format}')
+        os.system('rm -rf access_logs.parquet log_errors.csv')
+        adv.logs_to_df(log_file=log_file_path,
+                    output_file='access_logs.parquet',
+                    errors_file='log_errors.csv',
+                    log_format=log_format,
+                    fields=None)
 
-    return logs_df, visitors_in_hour, step_size
+        logs_df = pd.read_parquet('access_logs.parquet')
+        logs_df['datetime'] = pd.to_datetime(logs_df['datetime'],
+                                            format='%d/%b/%Y:%H:%M:%S %z')
+
+        logs_df['datetime'] = logs_df['datetime'].dt.strftime('%d/%b/%Y:%H:%M:%S')
+
+        visitors_in_hour = logs_df.groupby('datetime').size()
+
+        max_points_to_display = 1000
+
+        step_size = max(len(visitors_in_hour) // max_points_to_display, 1)
+
+        return logs_df, visitors_in_hour, step_size
 
 
 def generate_random_filename(content):
@@ -144,6 +176,10 @@ def dashboard():
             new_filename = random_filename + '.' + extension
             print(new_filename)
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], new_filename))
+            path = os.path.join(app.config['UPLOAD_FOLDER'], new_filename)
+            log_format = detect_log_format(path)
+            if(log_format == "unknown"):
+                return render_template('dashboard.html', error="Unknown format")
             return redirect(f"/reports/{random_filename}")
         if f:
             if len(f.read()) >= MAX_FILE_SIZE:
@@ -158,11 +194,38 @@ def dashboard():
     return render_template('dashboard.html', error=error)
 
 
+@app.route('/ssh',methods=['POST'])
+@login_required
+def ssh():
+    user = request.form['user']
+    hostname = request.form['hostname']
+    path = request.form['path']
+    password = request.form['password']
+    port = request.form['port']
+    if not port:
+        port = 22
+    print(user,hostname,port,password)
+    ssh_client = paramiko.SSHClient()
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh_client.connect(hostname, port=port, username=user, password=password)
+    with ssh_client.open_sftp() as sftp:
+        remote_file = sftp.file(path)
+        remote_file_content = remote_file.read()
+        md5_hash = hashlib.md5()
+        md5_hash.update(remote_file_content)
+        md5_filename = md5_hash.hexdigest()
+        destination_path = f'./uploads/{md5_filename}.txt'
+        with open(destination_path, 'wb') as local_file:
+            local_file.write(remote_file_content)
+    
+    return redirect(f'/reports/{md5_filename}')
+
+
 @app.route('/getInfo', methods=['GET'])
 @login_required
 def get_ip():
     client = request.args.get('client')
-    # whitelist = ["QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm."]
+    whitelist = string.ascii_lowercase + string.ascii_uppercase
     if client:
         curl_command = [
             'curl',
@@ -246,8 +309,8 @@ def reports(report):
         return "<script>document.location='/'</script>"
     full_name = report + file_extension
     log_file_path = f'./uploads/{full_name}'
-    logs_df, visitors_in_hour, step_size = create_df(log_file_path)
     log_format = detect_log_format(log_file_path)
+    logs_df, visitors_in_hour, step_size = create_df(log_file_path)
     max_points_to_display = 1000
     columns = logs_df.columns.tolist()
     logs_json = logs_df.to_json(orient='records', date_format='iso')
