@@ -330,7 +330,7 @@
                     class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
                     >Total Requests</span
                 >
-                <span
+                <span id="total_requests"
                     class="transition-all duration-700 font-semibold text-gray-900 dark:text-gray-100 block text-3xl"
                     >{{ total_requests }}</span
                 >
@@ -344,7 +344,7 @@
                     class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
                     >Valid Requests</span
                 >
-                <span
+                <span id="valid_requests"
                     class="transition-all duration-700 font-semibold text-green-600 dark:text-green-300 block text-3xl"
                     >{{ valid_requests }}</span
                 >
@@ -358,7 +358,7 @@
                     class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
                     >Failed Requests</span
                 >
-                <span
+                <span id="failed_requests"
                     class="transition-all duration-700 font-semibold text-red-600 dark:text-red-300 block text-3xl"
                     >{{ failed_requests }}</span
                 >
@@ -372,7 +372,7 @@
                     class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
                     >Unique Visitors</span
                 >
-                <span
+                <span id="unique_visitors"
                     class="transition-all duration-700 font-semibold text-indigo-600 dark:text-indigo-300 block text-3xl"
                     >{{ unique_visitors }}</span
                 >
@@ -386,7 +386,7 @@
                     class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
                     >Number of Requested Files</span
                 >
-                <span
+                <span id="num_requested_files"
                     class="transition-all duration-700 font-semibold text-blue-600 dark:text-blue-300 block text-3xl"
                     >{{ num_requested_files }}</span
                 >
@@ -401,7 +401,7 @@
                     class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
                     >Referrers</span
                 >
-                <span
+                <span id="referrers"
                     class="transition-all duration-700 font-semibold text-purple-600 dark:text-purple-300 block text-3xl"
                     >{{ referrers }}</span
                 >
@@ -416,7 +416,7 @@
                     class="transition-all duration-700 text-gray-600 dark:text-gray-300 font-semibold"
                     >Log Size</span
                 >
-                <span
+                <span id="log_size"
                     class="transition-all duration-700 font-semibold text-yellow-600 dark:text-yellow-300 block text-3xl"
                     >{{ log_size }}</span
                 >
@@ -660,8 +660,11 @@
                 yaxis: { title: 'Visitors' },
             };
 
-            Plotly.newPlot('visitors_per_hour', {{ visitors_per_hour|safe }}['data'], chartLayout1);
+            var Data1 = {{ visitors_per_hour|safe }}
+            console.log(Data1)
 
+            Plotly.newPlot('visitors_per_hour', Data1['data'], chartLayout1);
+            
             function updateChart1() {
                 var color = darkmode ? '#1a202c':'white';
                 var updatedLayout = {
@@ -670,7 +673,7 @@
                     font: {
                         color: darkmode ? 'white':'black'
                     },
-                    xaxis: {
+                    xaxis: {    
                         title: 'Timestamp'
                     },
                     yaxis: {
@@ -682,16 +685,16 @@
                 };
 
                 var selectedDataPoints1 = parseInt(document.getElementById('dataRange1').value);
-                selectedDataPoints1 = Math.min(Math.max(selectedDataPoints1, 0), {{ visitors_per_hour|safe }}['data'][0].x.length);
+                selectedDataPoints1 = Math.min(Math.max(selectedDataPoints1, 0), Data1['data'][0].x.length);
 
                 var initialXRange1 = [
-                    {{ visitors_per_hour|safe }}['data'][0].x[0],
-                    {{ visitors_per_hour|safe }}['data'][0].x[selectedDataPoints1 - 1]
+                    Data1['data'][0].x[0],
+                    Data1['data'][0].x[selectedDataPoints1 - 1]
                 ];
 
                 var updatedTrace1 = {
-                    x: {{ visitors_per_hour|safe }}['data'][0].x.slice(0, selectedDataPoints1),
-                    y: {{ visitors_per_hour|safe }}['data'][0].y.slice(0, selectedDataPoints1),
+                    x: Data1['data'][0].x.slice(0, selectedDataPoints1),
+                    y: Data1['data'][0].y.slice(0, selectedDataPoints1),
                     mode: 'lines+markers',
                     fill: 'tozeroy',
                     line: { shape: 'spline', smoothing: 1.3 },
@@ -699,7 +702,7 @@
                     fillcolor: 'rgba(0, 5, 255,0.2)',
                 };
 
-                document.getElementById('dataRange1').max = Math.min({{ visitors_per_hour|safe }}['data'][0].x.length, 1000);              
+                document.getElementById('dataRange1').max = Math.min(Data1['data'][0].x.length, 1000);              
 
                 Plotly.react('visitors_per_hour', [updatedTrace1], { xaxis: { range: initialXRange1 }, ...updatedLayout, animate: {
                     duration: 5000,
@@ -711,7 +714,7 @@
             updateChart1();
 
             document.addEventListener("DOMContentLoaded", function() {
-                var tableData = {{ visitors_per_hour|safe }}['data'][0];
+                var tableData = Data1['data'][0];
 
                 var timestamp = tableData.x;
                 var visitors = tableData.y;
@@ -773,7 +776,8 @@
             };
 
             // Create the Plotly graph with the provided data and layout
-            var chartData2 = {{ requested_files_chart|safe }}['data'];
+            var Data2 = {{ requested_files_chart|safe }}
+            var chartData2 = Data2['data'];
             Plotly.newPlot('requested_files_chart', chartData2, chartLayout);
 
             var originalChartData = chartData2;
@@ -940,6 +944,7 @@
             <script>
                 var chartDiv = 'not_found_urls_graph';
                 var logsData = {{data|safe}};
+                console.log(logsData)
                 var color = darkmode ? '#1a202c' : 'white';
                 var layout3 = {
                     paper_bgcolor: color,
@@ -1032,10 +1037,7 @@
 
             <script>
                 // Assuming you have a <div> with an id "chart" where you want to render the graph
-                var chartDiv2 = 'visitor_hostname';
-            
-                var logsData = {{data|safe}};
-            
+                var chartDiv2 = 'visitor_hostname';    
                 var color = darkmode ? '#1a202c' : 'white';
                 var layout4 = {
                     paper_bgcolor: color,
@@ -1303,6 +1305,34 @@
                     updateChart4();
                 }
             }
+            </script>
+            <script>
+                function updateData() {
+                    let creds = '{{ credentials }}'
+                    fetch('/logData/'+creds)
+                        .then(response => response.text())
+                        .then(data => {
+                            data = JSON.parse(data)
+                            console.log("hi")
+                            document.getElementById('total_requests').innerHTML = data['total_requests']
+                            document.getElementById('valid_requests').innerHTML = data['valid_requests']
+                            document.getElementById('failed_requests').innerHTML = data['failed_requests']
+                            document.getElementById('unique_visitors').innerHTML = data['unique_visitors']
+                            document.getElementById('num_requested_files').innerHTML = data['num_requested_files']
+                            document.getElementById('referrers').innerHTML = data['referrers']
+                            document.getElementById('log_size').innerHTML = data['log_size']
+                            Data1 = JSON.parse(data['visitors_per_hour'])
+                            updateChart1()
+                            Data2 = JSON.parse(data['requested_files_chart'])
+                            updateChart2()
+                            logsData = JSON.parse(data['logs_json'])
+                            updateChart3()
+                            updateChart4()
+                            setTimeout(updateData, 2000);
+                        });
+                }
+
+                updateData();
             </script>
         </div>
     </body>
