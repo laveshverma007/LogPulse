@@ -3,18 +3,21 @@ import pandas as pd
 from flask import Flask, render_template, request, send_from_directory, redirect, url_for, flash, session
 from flask_session import Session
 import os
+os.environ['EVENTLET_NO_GREENDNS'] = 'yes'
 import plotly.express as px
 import hashlib
 from datetime import datetime
+import json
 from loguru import logger
 import re
 import subprocess
 import string
+from flask_socketio import SocketIO, emit
 import plotly.graph_objs as go
 import paramiko
-from flask import Flask, render_template, redirect, url_for, request
 import sqlite3
 from flask_sqlalchemy import SQLAlchemy
+import humanize
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from functools import wraps
@@ -30,6 +33,7 @@ migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 MAX_FILE_SIZE = 10*1024*1024
 Session(app)
+socketio = SocketIO(app)
 
 ALLOWED_EXTENSIONS = {'txt', 'log'}
 app.config['UPLOAD_FOLDER'] = './uploads'
@@ -204,7 +208,25 @@ def ssh():
     port = request.form['port']
     if not port:
         port = 22
-    print(user,hostname,port,password)
+
+    data = {
+        'user': user,
+        'hostname': hostname,
+        'path': path,
+        'password': password,
+        'port': port
+    }
+
+    json_data = json.dumps(data)
+    md5_hash = hashlib.md5(json_data.encode()).hexdigest()
+    filename = os.path.join("ssh", f'{md5_hash}.json')
+    with open(filename, 'w') as file:
+        file.write(json_data)
+    
+    with open(filename, 'r') as file:
+        json_md5_hash = hashlib.md5()
+        json_md5_hash.update(file.read().encode('utf-8'))
+        json_md5 = json_md5_hash.hexdigest()
     ssh_client = paramiko.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh_client.connect(hostname, port=port, username=user, password=password)
@@ -214,11 +236,11 @@ def ssh():
         md5_hash = hashlib.md5()
         md5_hash.update(remote_file_content)
         md5_filename = md5_hash.hexdigest()
-        destination_path = f'./uploads/{md5_filename}.txt'
+        destination_path = f'./ssh/ssh_logs/{md5_filename}.txt'
         with open(destination_path, 'wb') as local_file:
             local_file.write(remote_file_content)
     
-    return redirect(f'/reports/{md5_filename}')
+    return redirect(f'/reports/live/{json_md5}')
 
 
 @app.route('/getInfo', methods=['GET'])
@@ -368,11 +390,212 @@ def reports(report):
     unique_visitors = logs_df['client'].nunique()
     referrers = "" if log_format == 'common' else logs_df[logs_df['referer']
                                                           != '-']['referer'].nunique()
-    log_size = os.path.getsize(log_file_path)
+    log_size_bytes = os.path.getsize(log_file_path)
+    log_size = humanize.naturalsize(log_size_bytes)
 
     return render_template('apache.html', num_requested_files=num_requested_files, visitors_per_hour=visitors_per_hour, columns=columns, data=logs_json, total_requests=total_requests, valid_requests=valid_requests,
                            failed_requests=failed_requests, unique_visitors=unique_visitors, referrers=referrers,
                            log_size=log_size, requested_files_chart=requested_files_chart)
+
+
+@app.route('/reports/live/<credentials>',methods=['GET'])
+@login_required
+def live_report(credentials):
+    flag = 0
+    for filename in os.listdir('./ssh'):
+        if os.path.splitext(filename)[0] == credentials:
+            flag = 1
+            file_extension = os.path.splitext(filename)[1].lower()
+            break
+    if (not flag):
+        return "<script>document.location='/'</script>"
+    full_name = credentials + file_extension
+    with open(f'./ssh/{full_name}', 'r') as f:
+        content = f.read()
+    print(content)
+    content = json.loads(content)
+    user = content['user']
+    hostname = content['hostname']
+    password = content['password']
+    port = content['port']
+    path = content['path']
+    ssh_client = paramiko.SSHClient()
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh_client.connect(hostname, port=port, username=user, password=password)
+    with ssh_client.open_sftp() as sftp:
+        remote_file = sftp.file(path)
+        remote_file_content = remote_file.read()
+        md5_hash = hashlib.md5()
+        md5_hash.update(remote_file_content)
+        md5_filename = md5_hash.hexdigest()
+        destination_path = f'./ssh/ssh_logs/{md5_filename}.txt'
+        with open(destination_path, 'wb') as local_file:
+            local_file.write(remote_file_content)
+    log_file_path = destination_path
+    log_format = detect_log_format(log_file_path)
+    logs_df, visitors_in_hour, step_size = create_df(log_file_path)
+    max_points_to_display = 1000
+    columns = logs_df.columns.tolist()
+    logs_json = logs_df.to_json(orient='records', date_format='iso')
+
+    trace = go.Scatter(
+        x=visitors_in_hour.index[::-1][::step_size],
+        y=visitors_in_hour.values[::-1][::step_size],
+        mode='lines+markers',
+        fill='tozeroy',
+        line=dict(shape='spline', smoothing=1.3),
+        marker=dict(size=8, symbol='circle')
+    )
+
+    fig = go.Figure(data=[trace])
+
+    initial_range = [
+        visitors_in_hour.index[0],
+        visitors_in_hour.index[len(visitors_in_hour) // 3]
+    ]
+
+    fig.update_xaxes(
+        rangeslider=dict(
+            visible=True,
+            range=initial_range
+        )
+    )
+
+    visitors_per_hour = fig.to_json()
+
+    requested_files_chart = requested_files(max_points_to_display, logs_df)
+
+    file_extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'ico', 'tiff', 'svg', 'webp',  # Image files
+                       'css', 'scss', 'less', 'sass', 'styl',  # Stylesheets
+                       'js', 'jsx', 'ts', 'tsx', 'coffee', 'dart',  # Script files
+                       'html', 'htm', 'php', 'asp', 'jsp', 'xml', 'xhtml',  # Webpage files
+                       'pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'csv', 'txt',  # Document files
+                       'mp3', 'wav', 'ogg', 'flac', 'aac', 'wma',  # Audio files
+                       'mp4', 'avi', 'wmv', 'flv', 'mkv', 'mov', 'webm',  # Video files
+                       # Archive files
+                       'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'pkg', 'deb', 'rpm', 'msi', 'dmg',
+                       'exe', 'msi', 'bat', 'sh', 'cmd', 'ps1',  # Executable files
+                       'json', 'xml', 'yaml', 'yml', 'toml',  # Configuration files
+                       'log', 'ini', 'conf', 'cfg', 'env',  # Configuration files
+                       # Database and data files
+                       'sql', 'db', 'sqlite', 'mdb', 'accdb', 'dbf', 'csv', 'tsv', 'jsonl',
+                       'svg', 'eps', 'ps', 'ai',  # Vector graphic files
+                       'ttf', 'otf', 'woff', 'woff2', 'eot', 'fon']  # Font files
+    num_requested_files = logs_df['request'].str.extract(
+        r'(\S+\.(?:' + '|'.join(file_extensions) + r'))', expand=False).nunique()
+    total_requests = len(logs_df)
+
+    valid_requests = len(logs_df[logs_df['status'].astype(str).str.startswith(
+        '2')]) + len(logs_df[logs_df['status'].astype(str).str.startswith('3')])
+    failed_requests = total_requests - valid_requests
+    unique_visitors = logs_df['client'].nunique()
+    referrers = "" if log_format == 'common' else logs_df[logs_df['referer']
+                                                          != '-']['referer'].nunique()
+    log_size_bytes = os.path.getsize(log_file_path)
+    log_size = humanize.naturalsize(log_size_bytes)
+
+    return render_template('apache_live.html', credentials=credentials, num_requested_files=num_requested_files, visitors_per_hour=visitors_per_hour, columns=columns, data=logs_json, total_requests=total_requests, valid_requests=valid_requests,
+                           failed_requests=failed_requests, unique_visitors=unique_visitors, referrers=referrers,
+                           log_size=log_size, requested_files_chart=requested_files_chart)
+
+@app.route('/logData/<credentials>')
+def logData(credentials):
+    flag = 0
+    for filename in os.listdir('./ssh'):
+        if os.path.splitext(filename)[0] == credentials:
+            flag = 1
+            file_extension = os.path.splitext(filename)[1].lower()
+            break
+    if (not flag):
+        return "<script>document.location='/'</script>"
+    full_name = credentials + file_extension
+    with open(f'./ssh/{full_name}', 'r') as f:
+        content = f.read()
+    print(content)
+    content = json.loads(content)
+    user = content['user']
+    hostname = content['hostname']
+    password = content['password']
+    port = content['port']
+    path = content['path']
+    ssh_client = paramiko.SSHClient()
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh_client.connect(hostname, port=port, username=user, password=password)
+    with ssh_client.open_sftp() as sftp:
+        remote_file = sftp.file(path)
+        remote_file_content = remote_file.read()
+        md5_hash = hashlib.md5()
+        md5_hash.update(remote_file_content)
+        md5_filename = md5_hash.hexdigest()
+        destination_path = f'./ssh/ssh_logs/{md5_filename}.txt'
+        with open(destination_path, 'wb') as local_file:
+            local_file.write(remote_file_content)
+    log_file_path = destination_path
+    log_format = detect_log_format(log_file_path)
+    logs_df, visitors_in_hour, step_size = create_df(log_file_path)
+    max_points_to_display = 1000
+    columns = logs_df.columns.tolist()
+    logs_json = logs_df.to_json(orient='records', date_format='iso')
+
+    trace = go.Scatter(
+        x=visitors_in_hour.index[::-1][::step_size],
+        y=visitors_in_hour.values[::-1][::step_size],
+        mode='lines+markers',
+        fill='tozeroy',
+        line=dict(shape='spline', smoothing=1.3),
+        marker=dict(size=8, symbol='circle')
+    )
+
+    fig = go.Figure(data=[trace])
+
+    initial_range = [
+        visitors_in_hour.index[0],
+        visitors_in_hour.index[len(visitors_in_hour) // 3]
+    ]
+
+    fig.update_xaxes(
+        rangeslider=dict(
+            visible=True,
+            range=initial_range
+        )
+    )
+
+    visitors_per_hour = fig.to_json()
+
+    requested_files_chart = requested_files(max_points_to_display, logs_df)
+
+    file_extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'ico', 'tiff', 'svg', 'webp',  # Image files
+                       'css', 'scss', 'less', 'sass', 'styl',  # Stylesheets
+                       'js', 'jsx', 'ts', 'tsx', 'coffee', 'dart',  # Script files
+                       'html', 'htm', 'php', 'asp', 'jsp', 'xml', 'xhtml',  # Webpage files
+                       'pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'csv', 'txt',  # Document files
+                       'mp3', 'wav', 'ogg', 'flac', 'aac', 'wma',  # Audio files
+                       'mp4', 'avi', 'wmv', 'flv', 'mkv', 'mov', 'webm',  # Video files
+                       # Archive files
+                       'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'pkg', 'deb', 'rpm', 'msi', 'dmg',
+                       'exe', 'msi', 'bat', 'sh', 'cmd', 'ps1',  # Executable files
+                       'json', 'xml', 'yaml', 'yml', 'toml',  # Configuration files
+                       'log', 'ini', 'conf', 'cfg', 'env',  # Configuration files
+                       # Database and data files
+                       'sql', 'db', 'sqlite', 'mdb', 'accdb', 'dbf', 'csv', 'tsv', 'jsonl',
+                       'svg', 'eps', 'ps', 'ai',  # Vector graphic files
+                       'ttf', 'otf', 'woff', 'woff2', 'eot', 'fon']  # Font files
+    num_requested_files = logs_df['request'].str.extract(
+        r'(\S+\.(?:' + '|'.join(file_extensions) + r'))', expand=False).nunique()
+    total_requests = len(logs_df)
+
+    valid_requests = len(logs_df[logs_df['status'].astype(str).str.startswith(
+        '2')]) + len(logs_df[logs_df['status'].astype(str).str.startswith('3')])
+    failed_requests = total_requests - valid_requests
+    unique_visitors = logs_df['client'].nunique()
+    referrers = "" if log_format == 'common' else logs_df[logs_df['referer']
+                                                          != '-']['referer'].nunique()
+    log_size_bytes = os.path.getsize(log_file_path)
+    log_size = humanize.naturalsize(log_size_bytes)
+    json_data = {"num_requested_files": num_requested_files, "visitors_per_hour": visitors_per_hour, "columns": columns, "logs_json": logs_json, "total_requests":total_requests, "valid_requests": valid_requests, "failed_requests": failed_requests, "unique_visitors":unique_visitors, "referrers": referrers, "log_size": log_size, "requested_files_chart":requested_files_chart}
+    return json_data
+
+
 
 
 if __name__ == '__main__':
